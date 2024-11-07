@@ -49,6 +49,10 @@ Mail：bitbuyer.0.8.1.a@icloud.com（件名には "bitBuyer 0.8.1.a" を必ず�
 
 - ライセンス -
 GNU General Public License, version 3。
+
+- スペシャルサンクス -
+Ai YAMAMOTO
+Saki UMEDA
 """
 
 """
