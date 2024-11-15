@@ -48,7 +48,7 @@ Shohei KIMURA
 Mail：bitbuyer.0.8.1.a@icloud.com（件名には "bitBuyer 0.8.1.a" を必ず含めてください）
 
 - ライセンス -
-GNU General Public License, version 3。
+GNU General Public License, version 3.
 
 - スペシャルサンクス -
 Ai YAMAMOTO
@@ -3049,8 +3049,30 @@ None
 ------------------------------------------------------------------------------------------------------------------
 
 ●ライセンス条項（LICENSE TERMS）
+　本アプリケーションは GPLv3 ライセンスの下、開発及び配布されています。
+
+0. bitBuyerプロジェクト（https://coin-clash-lab.com/bitbuyer-0-8-1-a-とは）
+   GPL v3（GNU General Public License version 3）
+   http://www.gnu.org/licenses/gpl-3.0.html
+
+   クレジット表記
+   - プロジェクト -
+   「bitBuyerプロジェクト」におけるオリジナル版「0.8.1.a」。
+
+   - 開発者 -
+   Shohei KIMURA
+
+   - 連絡先 -
+   Mail：bitbuyer.0.8.1.a@icloud.com（件名には "bitBuyer 0.8.1.a" を必ず含めてください）
+
+   - ライセンス -
+   GNU General Public License, version 3.
+
+   - スペシャルサンクス -
+   Ai YAMAMOTO
+   Saki UMEDA
+
 　本アプリケーションには、以下のソフトウェアが含まれています。
-　また、本アプリケーションは GPLv3 ライセンスの下、開発及び配布されています。
 
 1. PyQt5（https://www.riverbankcomputing.com/software/pyqt/intro）
    GPL v3（GNU General Public License version 3）
@@ -3079,8 +3101,30 @@ None
 
 ------------------------------------------------------------------------------------------------------------------
 
+ This application is developed and distributed under the GPLv3 license.
+
+0. bitBuyer Project（https://coin-clash-lab.com/bitbuyer-0-8-1-a-とは）
+   GPL v3（GNU General Public License version 3）
+   http://www.gnu.org/licenses/gpl-3.0.html
+
+   Credits
+   - Project -
+   The original version "0.8.1.a" of the "bitBuyer Project".
+
+   - Developer -
+   Shohei KIMURA
+
+   - Contact -
+   Mail: bitbuyer.0.8.1.a@icloud.com (Please include "bitBuyer 0.8.1.a" in the subject line)
+
+   - License -
+   GNU General Public License, version 3.
+
+   - Special Thanks -
+   Ai YAMAMOTO
+   Saki UMEDA
+
  This application includes the following software:
- Also, this application is developed and distributed under the GPLv3 license.
 
 1. PyQt5（https://www.riverbankcomputing.com/software/pyqt/intro）
    GPL v3（GNU General Public License version 3）
