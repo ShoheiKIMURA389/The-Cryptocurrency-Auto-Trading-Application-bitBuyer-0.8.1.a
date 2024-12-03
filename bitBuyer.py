@@ -53,6 +53,7 @@ GNU General Public License, version 3.
 - スペシャルサンクス -
 Ai YAMAMOTO
 Saki UMEDA
+And others, by memory with figures...
 """
 
 """
@@ -3071,6 +3072,7 @@ None
    - スペシャルサンクス -
    Ai YAMAMOTO
    Saki UMEDA
+   And others, by memory with figures...
 
 　本アプリケーションには、以下のソフトウェアが含まれています。
 
@@ -3123,6 +3125,7 @@ None
    - Special Thanks -
    Ai YAMAMOTO
    Saki UMEDA
+   And others, by memory with figures...
 
  This application includes the following software:
 
