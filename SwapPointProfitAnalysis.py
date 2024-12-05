@@ -82,6 +82,12 @@
 
 ---
 これで準備完了です。プログラムを実行してスワップ収益計算を体験してください！
+
+---
+【ライセンス】
+# このスクリプトは matplotlib ライブラリを利用しています。
+# matplotlib は BSD スタイルの Matplotlib License でライセンスされています。
+# 詳細: https://matplotlib.org/stable/users/license.html
 """
 
 # 【初期設定】
