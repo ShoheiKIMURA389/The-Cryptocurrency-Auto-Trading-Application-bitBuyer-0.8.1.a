@@ -95,7 +95,7 @@
 # 【初期投資額（円）】
 # このプログラムで運用を開始するための最初の投資金額を指定します。
 # この金額は最初に保有するロット数の購入に充当され、以後の計算に使用されます。
-InitialInvestment = 620000
+InitialInvestment = 650000
 
 # 【各通貨の一日当たりのスワップポイント（円）】
 # MXN/JPY（メキシコ・ペソ）と ZAR/JPY（南アフリカ・ランド）の通貨ペアで、
@@ -104,9 +104,9 @@ MxnSwapPerDay = 22
 ZarSwapPerDay = 18
 
 # 【1ロット購入に必要な金額】
-# 各通貨の1ロット（DMM FXの場合：1万通貨）を購入するために必要な日本円の金額を指定します。
+# 各通貨の1ロット（DMM FX の場合：1万通貨）を購入するために必要な日本円の金額を指定します。
 # この値は実際の為替レートを基に設定され、再投資や追加投資のロット数計算に使用されます。
-Mxn1LotCost = 2958  # MXN/JPY
+Mxn1LotCost = 2976  # MXN/JPY
 Zar1LotCost = 3318  # ZAR/JPY
 
 # 【初期ロット数】
@@ -148,6 +148,37 @@ def CalculateSwapGrowth():
     Returns:
         tuple: 日次、累積スワップの収益データを格納したリスト。
     """
+    # 補助関数：税金を計算
+    def CalculateTaxableIncome(Income):
+        """
+        所得金額に基づき、日本の所得税を税率のみで計算する関数。所得控除は考慮しません。
+
+        Args:
+            Income (float): 課税対象となる総収益金額（JPY）
+
+        Returns:
+            float: 税金引き後の収益金額（JPY）
+        """
+        # 所得税の速算表に基づく税率適用（控除額は無視）
+        if Income <= 1_949_000:
+            TaxRate = 0.05  # 税率：5%
+        elif Income <= 3_299_000:
+            TaxRate = 0.10  # 税率：10%
+        elif Income <= 6_949_000:
+            TaxRate = 0.20  # 税率：20%
+        elif Income <= 8_999_000:
+            TaxRate = 0.23  # 税率：23%
+        elif Income <= 17_999_000:
+            TaxRate = 0.33  # 税率：33%
+        elif Income <= 39_999_000:
+            TaxRate = 0.40  # 税率：40%
+        else:
+            TaxRate = 0.45  # 税率：45%
+
+        TaxAmount = Income * TaxRate  # 控除額を無視した税額
+        return Income - TaxAmount  # 税金差し引き後の収益を返す
+
+    """ CalculateSwapGrowth() の記述 """
     # 日次収益データの初期化
     DailySwap = []  # 日次収益データ
     CumulativeSwap = []  # 累積スワップポイントのデータ
@@ -155,25 +186,30 @@ def CalculateSwapGrowth():
     # 初期資産設定
     TotalInvestment = InitialInvestment  # 初期投資額
     TotalCumulativeSwap = 0  # 累積スワップポイントの累積
-    CurrentMxnLots = MxnLots  # MXN/JPYのロット数
-    CurrentZarLots = ZarLots  # ZAR/JPYのロット数
-    IsYearLimitReached = False  # 年間収益が上限に達したかを管理
+    CurrentMxnLots = MxnLots  # MXN/JPY のロット数
+    CurrentZarLots = ZarLots  # ZAR/JPY のロット数
     RemainingReinvestment = 0  # 再投資額の残高
+    IsYearLimitReached = False  # 年間収益が上限に達したかを管理
+
+    # 経過日数を管理する変数
+    DaysPassed = 0  # 日数のカウント用変数
 
     # 日次スワップ収益計算（3年間分）
     for Day in range(1, 3 * 365 + 1):
+        DaysPassed += 1  # 経過日数を1日ずつ加算
+
         # 各通貨の1日当たりのスワップ収益
-        MxnDailySwap = CurrentMxnLots * MxnSwapPerDay  # MXN/JPYの日次スワップ収益
-        ZarDailySwap = CurrentZarLots * ZarSwapPerDay  # ZAR/JPYの日次スワップ収益
+        MxnDailySwap = CurrentMxnLots * MxnSwapPerDay  # MXN/JPY の日次スワップ収益
+        ZarDailySwap = CurrentZarLots * ZarSwapPerDay  # ZAR/JPY の日次スワップ収益
 
         # 総スワップ収益（日次）
         DailyIncome = MxnDailySwap + ZarDailySwap  # 日次の総スワップ収益
 
-        # 複利計算のための再投資額（スワップポイントの50%）
+        # 複利計算のための再投資額（スワップポイントの 50%）
         Reinvestment = DailyIncome * 0.5  # 再投資額
         RemainingReinvestment += Reinvestment  # 再投資額を残高に追加
 
-        # 再投資でロットを購入（MXNとZARに分配）
+        # 再投資でロットを購入（MXN と ZAR に分配）
         while RemainingReinvestment >= Mxn1LotCost or RemainingReinvestment >= Zar1LotCost:
             if RemainingReinvestment >= Mxn1LotCost:
                 CurrentMxnLots += 1
@@ -191,7 +227,7 @@ def CalculateSwapGrowth():
                 MxnInvestment = BiMonthlyInvestment * 0.25
                 ZarInvestment = BiMonthlyInvestment * 0.25
 
-                # 入金額をMXNとZARに分配してロット数を増加
+                # 入金額を MXN と ZAR に分配してロット数を増加
                 if MxnInvestment >= Mxn1LotCost:
                     CurrentMxnLots += MxnInvestment // Mxn1LotCost
                     RemainingReinvestment += MxnInvestment % Mxn1LotCost
@@ -202,9 +238,12 @@ def CalculateSwapGrowth():
         # 累積スワップポイントの更新
         TotalCumulativeSwap += DailyIncome  # 全収益を累積
 
-        # 年間収益が上限に達した場合のフラグを更新
-        if TotalCumulativeSwap >= InvestmentIncomeLimit and not IsYearLimitReached:
-            IsYearLimitReached = True  # 年間収益の上限に到達
+        # 365 日を迎えた際に税金を適用
+        if DaysPassed >= 365:
+            # 1年間の収益に税金を適用
+            TaxAmount = CalculateTaxableIncome(TotalCumulativeSwap)  # 税金計算
+            TotalCumulativeSwap -= TaxAmount  # 税引後の収益に更新
+            DaysPassed = 0  # 経過日数をリセット
 
         # 日次収益の保存
         DailySwap.append(TotalInvestment)  # 日次の累積投資額を保存
@@ -226,14 +265,14 @@ def PlotSwapData(DailySwap, CumulativeSwap):
 
     # 日次データを年次データに変換
     DaysPerYear = 365  # 1年の日数
-    Years = [day / DaysPerYear for day in range(1, len(DailySwap) + 1)]  # 年単位のX軸
+    Years = [day / DaysPerYear for day in range(1, len(DailySwap) + 1)]  # 年単位の X 軸
 
     # 未運用スワップ収益を計算（累積スワップ収益から元本を差し引く）
     NotUsedSwap = [cumulative - InitialInvestment for cumulative in CumulativeSwap]
 
-    # フォーマッター関数: 金額を"K"単位に変換しカンマ区切りを追加
+    # フォーマッター関数: 金額を "K" 単位に変換しカンマ区切りを追加
     def FormatYAxisK(value, _):
-        return f"{int(value // 1_000):,}K"  # 1,000で割りカンマ区切りで"K"を付与
+        return f"{int(value // 1_000):,}K"  # 1,000 で割りカンマ区切りで "K" を付与
 
     # グラフウィンドウを作成（1行2列のサブプロット）
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))  # 1行2列の配置
@@ -241,17 +280,17 @@ def PlotSwapData(DailySwap, CumulativeSwap):
     # 運用中スワップ収益のグラフ（左側）
     axes[0].plot(Years, DailySwap, marker="o", label="Total Investment Amount (With Principal)", linestyle="--")
     axes[0].set_title("Total Investment Amount (With Principal)", fontsize=16)
-    axes[0].set_xlabel("Year", fontsize=14)
+    axes[0].set_xlabel("Year (already taxed)", fontsize=14)
     axes[0].set_ylabel("In Use Swap Income (JPY, in K)", fontsize=14)
-    axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸をK単位でカンマ区切り
+    axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸を "K" 単位でカンマ区切り
     axes[0].grid(True)  # グリッド表示
     axes[0].legend(fontsize=12)
 
     # 年間スワップ収益の参考値をグラフ内に表示
     try:
-        max_y = max(DailySwap) * 0.8 if max(DailySwap) > 0 else 1_000_000  # Y位置（デフォルト100万円）
+        max_y = max(DailySwap) * 0.8 if max(DailySwap) > 0 else 1_000_000  # Y 位置（デフォルト 100 万円）
         axes[0].text(
-            0.1,  # X位置（左寄り）
+            0.1,  # X 位置（左寄り）
             max_y,
             "Reference:\n1MXN: {0:,} JPY/year\n1ZAR: {1:,} JPY/year".format(MxnSwapPerYear, ZarSwapPerYear),
             fontsize=12,
@@ -264,9 +303,9 @@ def PlotSwapData(DailySwap, CumulativeSwap):
     # 未運用スワップ収益のグラフ（右側）
     axes[1].plot(Years, NotUsedSwap, marker="s", label="Unused Total Assets (Without Principal)", linewidth=2, color="orange")
     axes[1].set_title("Unused Total Assets (Without Principal)", fontsize=16)
-    axes[1].set_xlabel("Year", fontsize=14)
+    axes[1].set_xlabel("Year (already taxed)", fontsize=14)
     axes[1].set_ylabel("Not Used Swap Income (JPY, in K)", fontsize=14)
-    axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸をK単位でカンマ区切り
+    axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸を "K" 単位でカンマ区切り
     axes[1].grid(True)  # グリッド表示
     axes[1].legend(fontsize=12)
 
