@@ -95,12 +95,12 @@
 # 【初期投資額（円）】
 # このプログラムで運用を開始するための最初の投資金額を指定します。
 # この金額は最初に保有するロット数の購入に充当され、以後の計算に使用されます。
-InitialInvestment = 600000
+InitialInvestment = 620000
 
 # 【各通貨の一日当たりのスワップポイント（円）】
 # MXN/JPY（メキシコ・ペソ）と ZAR/JPY（南アフリカ・ランド）の通貨ペアで、
 # 1ロット当たりの1日毎に得られるスワップポイントを設定します。
-MxnSwapPerDay = 20
+MxnSwapPerDay = 22
 ZarSwapPerDay = 18
 
 # 【1ロット購入に必要な金額】
@@ -112,8 +112,8 @@ Zar1LotCost = 3318  # ZAR/JPY
 # 【初期ロット数】
 # 最初に購入するロット数を通貨ペア毎に設定します。
 # このロット数に基づいてスワップポイント収益が計算されます。
-MxnLots = 60  # MXN/JPY のロット数
-ZarLots = 50  # ZAR/JPY のロット数
+MxnLots = 100  # MXN/JPY のロット数
+ZarLots = 0  # ZAR/JPY のロット数
 
 # 【追加投資設定】
 # 偶数月の16日に行う追加投資に関する設定です。
@@ -239,10 +239,10 @@ def PlotSwapData(DailySwap, CumulativeSwap):
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))  # 1行2列の配置
 
     # 運用中スワップ収益のグラフ（左側）
-    axes[0].plot(Years, DailySwap, marker="o", label="In Use Swap Income (With Principal)", linestyle="--")
-    axes[0].set_title("In Use Swap Income (With Principal)", fontsize=16)
+    axes[0].plot(Years, DailySwap, marker="o", label="Total Investment Amount (With Principal)", linestyle="--")
+    axes[0].set_title("Total Investment Amount (With Principal)", fontsize=16)
     axes[0].set_xlabel("Year", fontsize=14)
-    axes[0].set_ylabel("Swap Income (JPY, in K)", fontsize=14)
+    axes[0].set_ylabel("In Use Swap Income (JPY, in K)", fontsize=14)
     axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸をK単位でカンマ区切り
     axes[0].grid(True)  # グリッド表示
     axes[0].legend(fontsize=12)
@@ -262,10 +262,10 @@ def PlotSwapData(DailySwap, CumulativeSwap):
         pass  # テキスト描画のエラーを無視
 
     # 未運用スワップ収益のグラフ（右側）
-    axes[1].plot(Years, NotUsedSwap, marker="s", label="Not Used Swap Income (Without Principal)", linewidth=2, color="orange")
-    axes[1].set_title("Not Used Swap Income (Without Principal)", fontsize=16)
+    axes[1].plot(Years, NotUsedSwap, marker="s", label="Unused Total Assets (Without Principal)", linewidth=2, color="orange")
+    axes[1].set_title("Unused Total Assets (Without Principal)", fontsize=16)
     axes[1].set_xlabel("Year", fontsize=14)
-    axes[1].set_ylabel("Swap Income (JPY, in K)", fontsize=14)
+    axes[1].set_ylabel("Not Used Swap Income (JPY, in K)", fontsize=14)
     axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸をK単位でカンマ区切り
     axes[1].grid(True)  # グリッド表示
     axes[1].legend(fontsize=12)
