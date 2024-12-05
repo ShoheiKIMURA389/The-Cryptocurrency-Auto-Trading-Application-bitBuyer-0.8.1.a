@@ -249,7 +249,7 @@ def CalculateSwapGrowth():
         DailySwap.append(TotalInvestment)  # 日次の累積投資額を保存
         CumulativeSwap.append(TotalCumulativeSwap)  # 累積スワップポイントを保存
 
-    return DailySwap, CumulativeSwap
+    return DailySwap, CumulativeSwap  # 計算結果を返す
 
 # グラフを描画する関数
 def PlotSwapData(DailySwap, CumulativeSwap):
@@ -278,10 +278,10 @@ def PlotSwapData(DailySwap, CumulativeSwap):
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))  # 1行2列の配置
 
     # 運用中スワップ収益のグラフ（左側）
-    axes[0].plot(Years, DailySwap, marker="o", label="Total Investment Amount (With Principal)", linestyle="--")
-    axes[0].set_title("Total Investment Amount (With Principal)", fontsize=16)
-    axes[0].set_xlabel("Year (already taxed)", fontsize=14)
-    axes[0].set_ylabel("In Use Swap Income (JPY, in K)", fontsize=14)
+    axes[0].plot(Years, DailySwap, marker = "o", label = "Total Investment Amount (With Principal)", linestyle = "--")
+    axes[0].set_title("Total Investment Amount (With Principal)", fontsize = 16)
+    axes[0].set_xlabel("Year (already taxed)", fontsize = 14)
+    axes[0].set_ylabel("In Use Swap Income (JPY, in K)", fontsize = 14)
     axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸を "K" 単位でカンマ区切り
     axes[0].grid(True)  # グリッド表示
     axes[0].legend(fontsize=12)
@@ -293,21 +293,21 @@ def PlotSwapData(DailySwap, CumulativeSwap):
             0.1,  # X 位置（左寄り）
             max_y,
             "Reference:\n1MXN: {0:,} JPY/year\n1ZAR: {1:,} JPY/year".format(MxnSwapPerYear, ZarSwapPerYear),
-            fontsize=12,
-            color="blue",
-            bbox=dict(facecolor="white", alpha=0.8, edgecolor="gray")  # テキストボックスのスタイル
+            fontsize = 12,
+            color = "blue",
+            bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスのスタイル
         )
     except Exception:
         pass  # テキスト描画のエラーを無視
 
     # 未運用スワップ収益のグラフ（右側）
-    axes[1].plot(Years, NotUsedSwap, marker="s", label="Unused Total Assets (Without Principal)", linewidth=2, color="orange")
-    axes[1].set_title("Unused Total Assets (Without Principal)", fontsize=16)
-    axes[1].set_xlabel("Year (already taxed)", fontsize=14)
-    axes[1].set_ylabel("Not Used Swap Income (JPY, in K)", fontsize=14)
+    axes[1].plot(Years, NotUsedSwap, marker = "s", label = "Unused Total Assets (Without Principal)", linewidth = 2, color = "orange")
+    axes[1].set_title("Unused Total Assets (Without Principal)", fontsize = 16)
+    axes[1].set_xlabel("Year (already taxed)", fontsize = 14)
+    axes[1].set_ylabel("Not Used Swap Income (JPY, in K)", fontsize = 14)
     axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # 縦軸を "K" 単位でカンマ区切り
     axes[1].grid(True)  # グリッド表示
-    axes[1].legend(fontsize=12)
+    axes[1].legend(fontsize = 12)
 
     # レイアウトを調整して表示
     plt.tight_layout()
