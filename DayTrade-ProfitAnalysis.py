@@ -7,9 +7,10 @@
 プログラムファイル名: "SwapPointProfitAnalysis.py"
 
 【機能】
-●入力された設定値に基づいたスワップポイント収益を日次で計算する機能（初期投資額の半分を運用）。
-●入力された設定値に基づいたデイトレード収益を日次で計算する機能。
-●入力された設定値に基づいた一定期間毎の追加投資処理機能（半分を運用）。
+●入力された設定値に基づいたスワップポイント収益を日次（年間取引可能日数261日分）で計算する機能（初期投資額の半分を運用）。
+●入力された設定値に基づいたデイトレード収益を日次（年間取引可能日数261日分）で計算する機能。
+●入力された設定値に基づいた一定期間毎（毎月・偶数月・両方）の追加投資処理機能（半分を運用）。
+●入力された設定値に基づいた、障害年金受給上限年収突破による追加投資停止機能。
 ●入力された設定値に基づいた、通貨毎のロットの配分比率の算出機能と、その比率に基づいて増資の配分や未運用残高の配分を計算する機能。
 ●目標証拠金維持率を超過した場合に、余剰資金を運用残高に移動する機能。
 ●日次リスク要因「1. デイトレードの取引回数の内、何回かで損失発生」「2. 時間帯によるボラティリティリスクを適用」「3. 年に二回大損失が発生」を計算する機能。
@@ -112,7 +113,7 @@
 # 初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
 # 残りの 50% は未運用分（元本）として管理され、課税対象外として扱われます。
 # この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
-InitialInvestmentYen = 805000
+InitialInvestmentYen = 823000
 
 # 【1ロット購入に必要な金額】
 # 各通貨の1ロット（DMM FX の場合：1万通貨）を購入するために必要な日本円の金額を指定します。
@@ -215,8 +216,8 @@ def InitializeGlobals():
         sys.exit(1)  # プログラムの実行を中止し、終了コード 1 を返す
 
     # 各通貨ペアにおける、1ロット当たりの年間スワップ収益を計算
-    MxnSwapPerYear = MxnSwapPerDay * 365  # MXN/JPY の年間スワップ収益
-    ZarSwapPerYear = ZarSwapPerDay * 365  # ZAR/JPY の年間スワップ収益
+    MxnSwapPerYear = MxnSwapPerDay * 261  # MXN/JPY の年間スワップ収益
+    ZarSwapPerYear = ZarSwapPerDay * 261  # ZAR/JPY の年間スワップ収益
 
 # 日次スワップ収益を計算する関数
 def CalculateDailySwap(CurrentMxnLots, CurrentZarLots, MxnSwapPerDay, ZarSwapPerDay):
@@ -730,6 +731,7 @@ def CalculateSwapAndTradingProfitGrowth():
     UnusedInvestment = InvestmentForTrading  # 初期未運用残高を設定
     RemainingReinvestment = 0  # 再投資残高を初期化
     AdditionalUnusedInvestment = 0  # 増資未運用残高を初期化
+    TradeDays = 0  # 実際に取引が可能な日数をカウントする変数を初期化
     TotalCumulativeSwapAndTradingProfit = 0  # 累積スワップ及びデイトレード収益を初期化
     PreviousCumulativeSwapAndTradingProfit = 0  # 前年の累積スワップ及びデイトレード収益を記録する変数を初期化
     UsedProfitForInvestment = 0  # 運用済み「累積スワップ及びデイトレード収益」を初期化
@@ -755,25 +757,33 @@ def CalculateSwapAndTradingProfitGrowth():
 
     # メインロジック
     for Day in range(1, Simulation * 365 + 1):  # 設定年分の日次計算を行うループを開始
-        # 日次スワップ収益とデイトレード収益を計算（初期デイトレード使用金額または必要証拠金の大きい方にデイトレード利益率を掛けて日次デイトレード収益を計算）
-        CalculateDailyIncome()  # 必要な値は全てグローバル変数として定義
+        # 1週間のサイクル（1 = 月曜日、7 = 日曜日）を判定
+        WeekDay = (Day - 1) % 7 + 1  # 月曜を 1、日曜を 7 とする
+        if WeekDay <= 5:  # 平日（1～5）の場合のみ取り引きを実行
+            TradeDays += 1  # 取引可能日をカウント
 
-        # 日次リスク要素を適用
-        ApplyDailyRiskFactors()  # 必要な値は全てグローバル変数として定義
+            # 日次スワップ収益とデイトレード収益を計算
+            # （初期デイトレード使用金額または必要証拠金の大きい方にデイトレード利益率を掛けて日次デイトレード収益を計算）
+            CalculateDailyIncome()  # 必要な値は全てグローバル変数として定義
 
-        # 再投資処理（補助関数を利用）
-        TotalInvestment, RemainingReinvestment, UsedProfitForInvestment, UsedUnusedInvestment, CurrentMxnLots, CurrentZarLots = \
-        PerformReinvestment(DailyIncome, TotalInvestment, TotalCumulativeSwapAndTradingProfit, UsedProfitForInvestment, Leverage,
-            MarginMaintenanceTarget, RemainingReinvestment, AdditionalUnusedInvestment, UsedUnusedInvestment,
-            CurrentMxnLots, CurrentZarLots, Mxn1LotCost, Zar1LotCost, MxnLotRatio, ZarLotRatio, TotalRatio)
+            # 日次リスク要素を適用
+            ApplyDailyRiskFactors()  # 必要な値は全てグローバル変数として定義
+
+            # 再投資処理（補助関数を利用）
+            TotalInvestment, RemainingReinvestment, UsedProfitForInvestment, UsedUnusedInvestment, CurrentMxnLots, CurrentZarLots = \
+            PerformReinvestment(DailyIncome, TotalInvestment, TotalCumulativeSwapAndTradingProfit, UsedProfitForInvestment, Leverage,
+                MarginMaintenanceTarget, RemainingReinvestment, AdditionalUnusedInvestment, UsedUnusedInvestment,
+                CurrentMxnLots, CurrentZarLots, Mxn1LotCost, Zar1LotCost, MxnLotRatio, ZarLotRatio, TotalRatio)
+
+            # 累積スワップ及びデイトレード収益を更新
+            TotalCumulativeSwapAndTradingProfit += DailyIncome  # デイトレード収益を含む日次収益を未運用「累積スワップ及びデイトレード収益」に加算
+        else:  # 週末ではスキップ、または異なる処理を記述可能
+            pass  # 必要なら週末用ロジックを記述
 
         # 追加投資処理（補助関数を利用）
         TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, CurrentMxnLots, CurrentZarLots = \
         PerformMonthlyInvestment(Day, TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, Mxn1LotCost, Zar1LotCost,
             MxnLotRatio, ZarLotRatio, TotalRatio, Leverage, CurrentMxnLots, CurrentZarLots)
-
-        # 累積スワップ及びデイトレード収益を更新
-        TotalCumulativeSwapAndTradingProfit += DailyIncome  # デイトレード収益を含む日次収益を各種未運用残高に加算
 
         if Day % 365 == 0:  # 年次税金処理
             CurrentYear = Day // 365  # 現在の年数（1年目、2年目、3年目……）
