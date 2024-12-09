@@ -115,8 +115,7 @@
 InitialInvestmentYen = 768000
 
 # 【各通貨の一日当たりのスワップポイント（円）】
-# MXN/JPY（メキシコ・ペソ）と ZAR/JPY（南アフリカ・ランド）の通貨ペアで、
-# 1ロット当たりの1日毎に得られるスワップポイントを設定します。
+# MXN/JPY（メキシコ・ペソ）と ZAR/JPY（南アフリカ・ランド）の通貨ペアで、1ロット当たりの1日毎に得られるスワップポイントを設定します。
 MxnSwapPerDay = 21
 ZarSwapPerDay = 17
 
@@ -135,17 +134,14 @@ LotCostLeveraged = True
 Leverage = 25
 
 # 【初期ロット数】
-# 最初に購入するロット数を通貨ペア毎に設定します。
-# このロット数に基づいてスワップポイント収益が計算されます。
+# 最初に購入するロット数を通貨ペア毎に設定します。このロット数に基づいてスワップポイント収益が計算されます。
 # 注意：レバレッジを参考に小さな値から計算を始めてください。この値を基に初期の必要証拠金が計算されます。
 MxnLots = 100  # MXN/JPY のロット数
 ZarLots = 0  # ZAR/JPY のロット数
 
 # 【証拠金維持率の目標値（%）】
-# このプログラムで運用を効率化するための目標となる証拠金維持率を設定します。
-# 証拠金維持率がこの値を超えた場合、未運用残高の一部を運用資金として振り分けます。
-# この設定により、運用効率を最大化し、未運用資金の過剰な蓄積を防ぎます。
-# 目標値は適切な安全域を考慮して調整することが推奨されます。
+# このプログラムで運用を効率化するための目標となる証拠金維持率を設定します。証拠金維持率がこの値を超えた場合、未運用残高の一部を運用資金として振り分けます。
+# この設定により、運用効率を最大化し、未運用資金の過剰な蓄積を防ぎます。目標値は適切な安全域を考慮して調整することが推奨されます。
 MarginMaintenanceTarget = 300  # 証拠金維持率目標値（パーセントを整数で入力。300% なら 300）
 
 # 【デイトレード設定】
@@ -154,27 +150,29 @@ MarginMaintenanceTarget = 300  # 証拠金維持率目標値（パーセント�
 DayTradingInvestmentRatio = 100
 
 # 【デイトレードによる予想追加収入（円/日）】
-# 毎日デイトレードを行うことで得られると想定される追加収入を設定します。
-# この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
+# 毎日デイトレードを行うことで得られると想定される追加収入を設定します。この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
 # デイトレードの実績や市場状況に応じてこの値を調整することが推奨されます。
 ExpectedDailyTradeProfitInputYen = 30000  # 1日当たりのデイトレードによる予想追加収益（円/日）
 
 # 【追加投資設定】
-# 偶数月の16日に行う追加投資に関する設定です。
-# この設定は、日本の年金受給者を想定しており、偶数月（2月、4月、6月...）に
-# 年金が支給されるタイミングで、一部の資金を追加投資に充当する前提で計算を行います。
-# 実際の日本の公的年金は「偶数月の15日」に支給されますが、16日を投入日とすることで、
-# 資金投入の判断を行う時間を確保することを目的としています。
+# 【毎月投入する追加投資額（円）】
+# 毎月26日に投入する追加投資額を指定します。
+# この設定は、日本の最も一般的な給料日を想定しており、給与が支払われるタイミングで、一部の資金を追加投資に充当する前提で計算を行います。
+# 実際の日本の最も一般的な給料日は25日ですが、26日を投入日とすることで、資金投入の判断を行う時間を確保することを目的としています。
+# MXN/JPY 及び ZAR/JPY のロット比率に基づいてこの金額の半分を運用に回し、新たなロットを購入します。
+MonthlyInvestment = 0  # 次の偶数月の設定と同時設定が可能です。
 
 # 【偶数月に投入する追加投資額（円）】
 # 偶数月16日に投入する追加投資額を指定します。
-# この金額の 25% ずつを MXN/JPY 及び ZAR/JPY に分配して新たなロットを購入します。
-BiMonthlyInvestment = 50000
+# この設定は、日本の年金受給者を想定しており、偶数月（2月、4月、6月……）に年金が支給されるタイミングで、一部の資金を追加投資に充当する前提で計算を行います。
+# 実際の日本の公的年金は「偶数月の15日」に支給されますが、16日を投入日とすることで、資金投入の判断を行う時間を確保することを目的としています。
+# MXN/JPY 及び ZAR/JPY のロット比率に基づいてこの金額の半分を運用に回し、新たなロットを購入します。
+BiMonthlyInvestment = 50000  # 前の毎月の設定と同時設定が可能です。
 
 # 【年間収益がこの金額に達すると追加投資を中止】
 # 障害年金受給者を想定し、年収が 370 万円を超えると障害年金の支給が半減、472 万円を超えると停止されるため、
-# この金額を上限として追加投資を中止するよう設定しています。
-# ただし、上限に達するまでに計画されている当年分の追加投資は実行されます。
+# この金額を上限として追加投資を中止するよう設定しています。ただし、上限に達するまでに計画されている当年分の追加投資は実行されます。
+# 注意：この設定項目に該当しない方は極端に大きな値を設定してください。
 InvestmentIncomeLimit = 3700000
 
 # 【シミュレーション年数】
@@ -566,16 +564,16 @@ def CalculateSwapAndTradingProfitGrowth():
         # 計算結果を返す
         return TotalInvestment, RemainingReinvestment, UsedProfitForInvestment, UsedUnusedInvestment, CurrentMxnLots, CurrentZarLots
 
-    # 補助関数：偶数月16日の追加投資処理
-    def PerformBiMonthlyInvestment(Day, TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, BiMonthlyInvestment,
-        Mxn1LotCost, Zar1LotCost, MxnLotRatio, ZarLotRatio, TotalRatio, Leverage, CurrentMxnLots, CurrentZarLots):
+    # 補助関数：毎月26日または偶数月16日またはその両方の追加投資処理
+    def PerformMonthlyInvestment(Day, TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, Mxn1LotCost, Zar1LotCost,
+        MxnLotRatio, ZarLotRatio, TotalRatio, Leverage, CurrentMxnLots, CurrentZarLots):
         """
-        偶数月16日に追加投資を行い、その投資額を基に再投資を実施する関数。
+        毎月26日または偶数月16日またはその両方で追加投資を行い、その投資額を基に再投資を実施する関数。
 
         この関数は以下の処理を順序立てて行います：
 
         1. 追加投資の実施
-        - 偶数月16日（シミュレーション内で指定された条件の日付）に追加投資を行います。
+        - 毎月26日または偶数月16日またはその両方（シミュレーション内で指定された条件の日付）で追加投資を行います。
         - 投資額を以下の二つに分配します：
             - 再投資残高（RemainingReinvestment）：投資額の半分を運用準備金として加算。
             - 増資未運用残高（AdditionalUnusedInvestment）：投資額の半分を未運用の増資金額として記録。
@@ -610,7 +608,6 @@ def CalculateSwapAndTradingProfitGrowth():
             TotalInvestment (float): 運用残高（必要証拠金）。
             RemainingReinvestment (float): 再投資残高（運用残高の追加準備金、レバレッジ未適用）。
             AdditionalUnusedInvestment (float): 「増資未運用残高（累積）」。
-            BiMonthlyInvestment (float): 偶数月16日に行う追加投資額。
             Mxn1LotCost (float): 1ロット当たりの MXN/JPY の購入費用。
             Zar1LotCost (float): 1ロット当たりの ZAR/JPY の購入費用。
             MxnLotRatio (float): MXN への投資比率。
@@ -628,9 +625,23 @@ def CalculateSwapAndTradingProfitGrowth():
                 - CurrentMxnLots (int): 更新後の MXN/JPY ロット数。
                 - CurrentZarLots (int): 更新後の ZAR/JPY ロット数。
         """
-        if Day % 30 == 15 and (Day // 30 + 1) % 2 == 0:  # 偶数月16日かどうかを判定
-            RemainingReinvestment += BiMonthlyInvestment * 0.5  # 追加投資額の半分を再投資残高に加算
-            AdditionalUnusedInvestment += BiMonthlyInvestment * 0.5  # 追加投資額の半分を未運用残高に加算
+        # 補助関数：外部関数のコアロジック
+        def ProcessInvestment():
+            """
+            再投資残高に基づき、利用可能な証拠金を計算し、比率に従って MXN 及び ZAR に投資を行う関数。
+
+            この関数は以下の処理を行います：
+            1. レバレッジの有無に応じた利用可能資金の計算。
+            2. 比率に基づく投資金額の割り当て。
+            3. MXN 及び ZAR へのロット単位での投資。
+            4. 購入後の再投資残高の計算。
+
+            必要な変数は "nonlocal" キーワードを用いて外部スコープから参照及び変更します。
+
+            Returns:
+                None
+            """
+            nonlocal RemainingReinvestment, TotalInvestment, CurrentMxnLots, CurrentZarLots  # 外部スコープの変数を参照
 
             # 再投資残高にレバレッジを不適用・適用して取引可能金額を算出
             AvailableFunds = RemainingReinvestment if LotCostLeveraged else RemainingReinvestment * Leverage
@@ -659,6 +670,19 @@ def CalculateSwapAndTradingProfitGrowth():
 
             # 購入後の再投資残高を計算
             RemainingReinvestment = AvailableFunds if LotCostLeveraged else AvailableFunds / Leverage
+
+        """ PerformMonthlyInvestment() の記述 """
+        # 毎月26日に追加投資を行う
+        if Day % 30 == 26:  # 毎月26日かどうかを判定
+            RemainingReinvestment += MonthlyInvestment * 0.5  # 追加投資額の半分を再投資残高に加算
+            AdditionalUnusedInvestment += MonthlyInvestment * 0.5  # 追加投資額の半分を未運用残高に加算
+            ProcessInvestment()  # 補助関数を利用して、再投資残高に基づき、利用可能な証拠金を計算し、比率に従って MXN 及び ZAR に投資を行う
+
+        # 偶数月16日に追加投資を行う
+        if Day % 30 == 15 and (Day // 30 + 1) % 2 == 0:  # 偶数月16日かどうかを判定
+            RemainingReinvestment += BiMonthlyInvestment * 0.5  # 追加投資額の半分を再投資残高に加算
+            AdditionalUnusedInvestment += BiMonthlyInvestment * 0.5  # 追加投資額の半分を未運用残高に加算
+            ProcessInvestment()  # 補助関数を利用して、再投資残高に基づき、利用可能な証拠金を計算し、比率に従って MXN 及び ZAR に投資を行う
 
         return TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, CurrentMxnLots, CurrentZarLots  # 更新後の状態を返す
 
@@ -743,10 +767,10 @@ def CalculateSwapAndTradingProfitGrowth():
             MarginMaintenanceTarget, RemainingReinvestment, AdditionalUnusedInvestment, UsedUnusedInvestment,
             CurrentMxnLots, CurrentZarLots, Mxn1LotCost, Zar1LotCost, MxnLotRatio, ZarLotRatio, TotalRatio)
 
-        # 偶数月16日の追加投資（補助関数を利用）
+        # 追加投資処理（補助関数を利用）
         TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, CurrentMxnLots, CurrentZarLots = \
-        PerformBiMonthlyInvestment(Day, TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, BiMonthlyInvestment,
-            Mxn1LotCost, Zar1LotCost, MxnLotRatio, ZarLotRatio, TotalRatio, Leverage, CurrentMxnLots, CurrentZarLots)
+        PerformMonthlyInvestment(Day, TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, Mxn1LotCost, Zar1LotCost,
+            MxnLotRatio, ZarLotRatio, TotalRatio, Leverage, CurrentMxnLots, CurrentZarLots)
 
         # 累積スワップ及びデイトレード収益を更新
         TotalCumulativeSwapAndTradingProfit += DailyIncome  # デイトレード収益を含む日次収益を各種未運用残高に加算
