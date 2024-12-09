@@ -926,7 +926,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYleft * 0.43,  # テキストの Y 座標位置を最大値の 43% に配置（リスク織り込み済み表示の少し下）
             # 最終月の翌月の月収をフォーマットして表示
-            "Last Monthly Income:\n{0:,} JPY/day".format(int(MonthlyIncome)),
+            "Last Monthly Income:\n{0:,} JPY/month".format(int(MonthlyIncome)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "red",  # テキストの色を赤に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
