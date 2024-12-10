@@ -1006,7 +1006,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYright * 1.09,  # テキストの Y 座標位置を最大値の 109% に配置（初期投資額表示の少し下）
             # デイトレード収益をフォーマットして表示
-            "Profit / Day Trading:\n{0:,} JPY/day".format(int(ExpectedDailyTradeProfit)),
+            "Profit / Day Trading:\n{0:,} JPY/day (now)".format(int(ExpectedDailyTradeProfit)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "purple",  # テキストの色を紫に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
