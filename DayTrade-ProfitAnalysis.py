@@ -108,14 +108,23 @@
 【初期設定】
 以下の説明に従って初期設定値を入力してください。
 """
+# 【投資開始日】
+# 実際に取り引きを始めた年月日を入力します。
+# この日付に基づいて、次の設定項目である「初期投資額」から現在までの、口座残高の増分を考慮した日次デイトレード利益率を算出します。
+InvestmentStartDay = "2024/12/05"
+
 # 【初期投資額（円）】
-# このプログラムで運用を開始するための最初の投資金額を指定します。
-# 初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
-# 残りの 50% は未運用分（元本）として管理され、課税対象外として扱われます。
-# この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
-InitialInvestmentYen = 905000
+# このプログラムで運用を開始するための最初の投資金額を指定します。初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
+# 残りの 50% は未運用分（元本）として管理されます。この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
+# またこの金額に基づいて、次の設定項目である「現在の口座残高」との差額を算出し、日次デイトレード利益率の算出を行います。
+InitialInvestmentYen = 600000
 # 初期投資額の内、スワップポイント運用に回す割合（パーセントを整数で入力。50% なら 50）
 InitialSwapRatio = 50
+
+# 【現在の口座残高（円）】
+# 初期投資額を含めた現在の口座残高を入力します。
+# 初期投資額と同額でも構いませんが、その場合は日次デイトレード利益率の計算のために設定項目「デイトレードによる予想追加収入」に適切な値を入力してください。
+CurrentBalance = 976000
 
 # 【レバレッジ】
 # 適用するレバレッジの倍率を整数で設定します（25倍なら25）。
@@ -124,7 +133,7 @@ Leverage = 25
 # 【1ロット購入に必要な金額】
 # 各通貨の1ロット（DMM FX の場合：1万通貨）を購入するために必要な日本円の金額を指定します。
 # この値は実際の為替レートを基に設定され、再投資や追加投資のロット数計算に使用されます。
-Mxn1LotCost = 2998  # MXN/JPY
+Mxn1LotCost = 3005  # MXN/JPY
 Zar1LotCost = 3403  # ZAR/JPY
 # 1ロット購入金額がレバレッジ適用後の価格である場合は以下を True、そうでなければ False にします。
 # レバレッジが適用されていない場合、1通貨の対円価格を最小取引単位倍した価格が1ロットの購入に必要な価格とほとんど等しくなります。
@@ -157,8 +166,9 @@ DayTradingInvestmentRatio = 100
 
 # 【デイトレードによる予想追加収入（円/日）】
 # 毎日デイトレードを行うことで得られると想定される追加収入を設定します。この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
-# デイトレードの実績や市場状況に応じてこの値を調整することが推奨されます。
-ExpectedDailyTradeProfitInputYen = 60000  # 1日当たりのデイトレードによる予想追加収益（円/日）
+# デイトレードの実績や市場状況に応じてこの値を調節することが推奨されます。
+# 既に取り引きを行っていて、これまでの設定項目の説明によってこの項目の入力の必要を促されない場合は、0 と設定してください。
+ExpectedDailyTradeProfitInputYen = 0  # 1日当たりのデイトレードによる予想追加収益（円/日）
 
 # 【追加投資設定】
 # 【毎月投入する追加投資額（円）】
@@ -222,6 +232,7 @@ def InitializeGlobals():
         # デイトレード使用金額率を小数に変換
         DayTradingInvestmentRatio = DayTradingInvestmentRatio / 100 if DayTradingInvestmentRatio > 0 else 0
 
+        # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率を計算
         if DayTradingInvestmentRatio > 0:  # デイトレード使用金額率が 0 でないことを確認
             DayTradingInvestment = InitialInvestmentYen * DayTradingInvestmentRatio  # デイトレードに使用する金額を計算
             TradeProfitRate = ExpectedDailyTradeProfitInputYen / DayTradingInvestment \
@@ -229,8 +240,32 @@ def InitializeGlobals():
         else:  # デイトレード使用金額率が 0 の場合
             TradeProfitRate = 0  # デイトレード利益率を 0 に設定
 
+        # 必要なライブラリをインポート
+        from datetime import datetime, timedelta  # datetime モジュールをインポートして日付操作を可能にする
+
+        # 投資開始日と現在の日付を解析
+        StartDate = datetime.strptime(InvestmentStartDay, "%Y/%m/%d")  # 投資開始日を解析し、datetime オブジェクトに変換する
+        CurrentDate = datetime.now()  # 現在の日付を取得
+        TotalDays = (CurrentDate - StartDate).days  # 投資開始日から現在の日付までの経過日数を計算
+
+        # 土日を除外した営業日数を計算
+        BusinessDays = 0  # 営業日数のカウンタを初期化
+        for DayOffset in range(TotalDays + 1):  # 経過日数分をループ
+            Date = StartDate + timedelta(days=DayOffset)  # 投資開始日からの各日付を計算
+            if Date.weekday() < 5:  # 月曜（0）～金曜（4）が営業日
+                BusinessDays += 1  # 営業日数をインクリメント
+
+        # 複利を考慮したデイトレード利益率を計算
+        if BusinessDays > 0:  # 営業日数が有効であることを確認
+            DailyProfitRate = (CurrentBalance / InitialInvestmentYen) ** (1 / BusinessDays) - 1  # デイトレード利益率を複利ベースで計算
+        else:
+            DailyProfitRate = 0  # 営業日数が 0 の場合の安全策
+
+        # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率、複利を考慮したデイトレード利益率の高い方を選択
+        TradeProfitRate = max(TradeProfitRate, DailyProfitRate)  # 「デイトレードによる予想追加収入」に適切な値が設定されていることが前提
+
         # 計算された日次デイトレード収益（円/日）
-        ExpectedDailyTradeProfit = InitialInvestmentYen * DayTradingInvestmentRatio * TradeProfitRate
+        ExpectedDailyTradeProfit = max(InitialInvestmentYen, CurrentBalance) * DayTradingInvestmentRatio * TradeProfitRate
     else:  # 初期投資額が 0 の場合
         import sys  # システム操作に必要なモジュールをインポート
         print("初期投資金額が 0 に設定されています。プログラムの実行を中止しました。")
@@ -761,7 +796,6 @@ def CalculateSwapAndTradingProfitGrowth():
 
     # 初期化：各種変数
     TotalInvestment = InitialRequiredMargin  # 初期必要証拠金を運用残高として代入
-    UnusedInvestment = InvestmentForTrading  # 初期未運用残高を設定
     RemainingReinvestment = 0  # 再投資残高を初期化
     AdditionalUnusedInvestment = 0  # 増資未運用残高を初期化
     TradeDays = 0  # 実際に取引が可能な日数をカウントする変数を初期化
@@ -834,9 +868,10 @@ def CalculateSwapAndTradingProfitGrowth():
             # 前年度の累積スワップ及びデイトレード収益を更新
             PreviousCumulativeSwapAndTradingProfit = TotalCumulativeSwapAndTradingProfit
 
-        # 日次データを記録（一行目：運用残高、二行目：初期投資額＋増資未運用残高（運用済み含む）＋累積スワップ及びデイトレード収益）
+        # 日次データを記録（一行目：運用残高、二行目：初期投資額または現在の口座残高＋増資未運用残高（運用済み含む）＋累積スワップ及びデイトレード収益）
         DailySwapAndTradingProfit.append(TotalInvestment)
-        CumulativeSwapAndTradingProfit.append(InitialInvestmentYen + AdditionalUnusedInvestment + TotalCumulativeSwapAndTradingProfit)
+        CumulativeSwapAndTradingProfit.append(
+            max(InitialInvestmentYen, CurrentBalance) + AdditionalUnusedInvestment + TotalCumulativeSwapAndTradingProfit)
 
     return DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit  # 計算結果を返す
 
@@ -941,12 +976,12 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
         )
 
-        # 初期投資額の参考値を表示
+        # 投資額の参考値を表示
         axes[0].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYleft * 1.03,  # テキストの Y 座標位置を最大値の 103% に配置（スワップ収益参考値の少し下）
-            # 初期投資額と n% が運用されていることをフォーマットして表示
-            "Initial Investment:\n{0:,} JPY ({1}% used)".format(InitialInvestmentYen, round(InitialSwapRatio * 100)),
+            # 投資額と n% が運用されていることをフォーマットして表示
+            "Current Balance:\n{0:,} JPY ({1}% used)".format(CurrentBalance, round(InitialSwapRatio * 100)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "green",  # テキストの色を緑に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
@@ -955,7 +990,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         # デイトレード収益の参考値を表示
         axes[0].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
-            MaxYleft * 0.88,  # テキストの Y 座標位置を最大値の 88% に配置（初期投資額表示の少し下）
+            MaxYleft * 0.88,  # テキストの Y 座標位置を最大値の 88% に配置（投資額表示の少し下）
             # デイトレード収益と 50% が運用されていることをフォーマットして表示
             "Profit / Day Trading:\n{0:,} JPY/day (50% used)".format(int(ExpectedDailyTradeProfit)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
@@ -986,12 +1021,12 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         )
 
         """ 右側のグラフ """
-        # 初期投資額の参考値を表示
+        # 投資額の参考値を表示
         axes[1].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
-            MaxYright * 1.24,  # テキストの Y 座標位置を最大値の 124% に配置（スワップ収益参考値の少し下）
-            # 初期投資額と n% が未運用とされていることをフォーマットして表示
-            "Initial Investment:\n{0:,} JPY".format(InitialInvestmentYen),
+            MaxYright * 1.24,  # テキストの Y 座標位置を最大値の 124% に配置（上部）
+            # 投資額をフォーマットして表示
+            "Current Balance:\n{0:,} JPY".format(CurrentBalance),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "green",  # テキストの色を緑に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
@@ -1000,7 +1035,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         # デイトレード収益の参考値を表示
         axes[1].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
-            MaxYright * 1.09,  # テキストの Y 座標位置を最大値の 109% に配置（初期投資額表示の少し下）
+            MaxYright * 1.09,  # テキストの Y 座標位置を最大値の 109% に配置（投資額表示の少し下）
             # デイトレード収益をフォーマットして表示
             "Profit / Day Trading:\n{0:,} JPY/day (now)".format(int(ExpectedDailyTradeProfit)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
@@ -1018,7 +1053,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         # 月収の参考値を表示
         axes[1].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
-            MaxYright * 0.94,  # テキストの Y 座標位置を最大値の 94% に配置（初期投資額表示の少し下）
+            MaxYright * 0.94,  # テキストの Y 座標位置を最大値の 94% に配置（デイトレード収益表示の少し下）
             # 月収の参考値をフォーマットして表示
             "Last Monthly Income:\n{0:,} JPY/month".format(int(MonthlyIncome)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
