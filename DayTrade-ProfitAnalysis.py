@@ -995,7 +995,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYright * 1.24,  # テキストの Y 座標位置を最大値の 124% に配置（スワップ収益参考値の少し下）
             # 初期投資額と n% が未運用とされていることをフォーマットして表示
-            "Initial Investment:\n{0:,} JPY ({1}% added)".format(InitialInvestmentYen, (100 - round(InitialSwapRatio * 100))),
+            "Initial Investment:\n{0:,} JPY".format(InitialInvestmentYen),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "green",  # テキストの色を緑に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
