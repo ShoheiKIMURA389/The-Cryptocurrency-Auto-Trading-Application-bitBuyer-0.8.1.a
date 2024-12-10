@@ -900,10 +900,11 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
     # グラフタイトルを設定
     axes[0].set_title("Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), fontsize = 16)
     axes[0].set_xlabel("Year (already taxed)", fontsize = 14)  # X 軸ラベルを設定
-    axes[0].set_ylabel("In Use Swap & Day Trading Income (JPY, in M)", fontsize = 14)  # Y 軸ラベルを設定
     if IfSelectedK:
+        axes[0].set_ylabel("In Use Swap & Day Trading Income (JPY, in K)", fontsize = 14)  # Y 軸ラベルを設定
         axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # Y 軸の数値を "K" 単位でカンマ区切り表示にする
     else:
+        axes[0].set_ylabel("In Use Swap & Day Trading Income (JPY, in M)", fontsize = 14)  # Y 軸ラベルを設定
         axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisM))  # Y 軸の数値を "M" 単位でカンマ区切り表示にする
     axes[0].grid(True)  # グリッドを表示
     axes[0].legend(fontsize = 12)  # 凡例を設定
@@ -914,10 +915,11 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         Years, NotUsed, marker = "s", label = "Total Assets of Account (With Principal)", linewidth = 2, color = "orange")
     axes[1].set_title("Total Assets of Account (With Principal)", fontsize = 16)  # グラフタイトルを設定
     axes[1].set_xlabel("Year (already taxed)", fontsize = 14)  # X 軸ラベルを設定
-    axes[1].set_ylabel("Not Used Swap & Day Trading Income (JPY, in M)", fontsize = 14)  # Y 軸ラベルを設定
     if IfSelectedK:
+        axes[1].set_ylabel("Not Used Swap & Day Trading Income (JPY, in K)", fontsize = 14)  # Y 軸ラベルを設定
         axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisK))  # Y 軸の数値を "K" 単位でカンマ区切り表示にする
     else:
+        axes[1].set_ylabel("Not Used Swap & Day Trading Income (JPY, in M)", fontsize = 14)  # Y 軸ラベルを設定
         axes[1].yaxis.set_major_formatter(mticker.FuncFormatter(FormatYAxisM))  # Y 軸の数値を "M" 単位でカンマ区切り表示にする
     axes[1].grid(True)  # グリッドを表示
     axes[1].legend(fontsize = 12)  # 凡例を設定
