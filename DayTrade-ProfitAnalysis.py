@@ -113,7 +113,7 @@
 # 初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
 # 残りの 50% は未運用分（元本）として管理され、課税対象外として扱われます。
 # この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
-InitialInvestmentYen = 882000
+InitialInvestmentYen = 905000
 # 初期投資額の内、スワップポイント運用に回す割合（パーセントを整数で入力。50% なら 50）
 InitialSwapRatio = 50
 
@@ -878,17 +878,12 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         return "{:,.0f}M".format(X // 1_000_000)  # 値を 1,000,000 で割り、"M" 単位にフォーマットして返す
 
     """ PlotSwapData() の記述 """
-    import matplotlib.pyplot as plt  # グラフの描画やデータの視覚化を行うためのライブラリ
-    import matplotlib.ticker as mticker  # グラフの軸ラベルや目盛りのカスタマイズに使用するモジュール
+    import matplotlib.pyplot as plt  # グラフ描画のためのモジュール
+    import matplotlib.ticker as mticker  # グラフの目盛りや軸ラベルを調整するモジュール
 
     # 日次データを年次データに変換
     DaysPerYear = 365  # 1年の日数
     Years = [day / DaysPerYear for day in range(1, len(DailySwapAndTradingProfit) + 1)]  # 年単位の X 軸
-
-    # 未運用スワップ及びデイトレード収益を計算
-    NotUsed = [
-        cumulative - InvestmentForTrading  # 初期投資額の内、スワップポイント未運用分を差し引く
-        for cumulative in CumulativeSwapAndTradingProfit]
 
     # グラフウィンドウを作成（1行2列のサブプロット）
     fig, axes = plt.subplots(1, 2, figsize = (16, 6))  # 1行2列の配置
@@ -896,7 +891,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
     # 運用中残高のグラフ（左側）
     # 未運用残高をプロットし、凡例に「Total Investment Amount for Swap (With n% Principal)」を設定
     axes[0].plot(Years, DailySwapAndTradingProfit, marker = "o",
-        label = "Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), linestyle = "--")
+        label = "Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), linestyle = "--", color = "blue")
     # グラフタイトルを設定
     axes[0].set_title("Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), fontsize = 16)
     axes[0].set_xlabel("Year (already taxed)", fontsize = 14)  # X 軸ラベルを設定
@@ -909,10 +904,11 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
     axes[0].grid(True)  # グリッドを表示
     axes[0].legend(fontsize = 12)  # 凡例を設定
 
-    # 未運用残高のグラフ（右側）
+    # 累積スワップ及びデイトレード収益のグラフ（右側）
     axes[1].plot(
-        # 未運用残高をプロットし、凡例に「Total Assets of Account (With Principal)」を設定
-        Years, NotUsed, marker = "s", label = "Total Assets of Account (With Principal)", linewidth = 2, color = "orange")
+        # 累積スワップ及びデイトレード収益をプロットし、凡例に「Total Assets of Account (With Principal)」を設定
+        Years, CumulativeSwapAndTradingProfit, marker = "s", label = "Total Assets of Account (With Principal)", linewidth = 2,
+        color = "purple")
     axes[1].set_title("Total Assets of Account (With Principal)", fontsize = 16)  # グラフタイトルを設定
     axes[1].set_xlabel("Year (already taxed)", fontsize = 14)  # X 軸ラベルを設定
     if IfSelectedK:
@@ -928,10 +924,10 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
     try:
         # 左右グラフのスケールを統一
         axes[0].set_ylim(0, max(DailySwapAndTradingProfit) * 1.2)  # 左グラフの Y 軸範囲を設定（最大値の 120% を上限）
-        axes[1].set_ylim(0, max(NotUsed) * 1.2)  # 右グラフの Y 軸範囲を設定（最大値の 120% を上限）
+        axes[1].set_ylim(0, max(CumulativeSwapAndTradingProfit) * 1.2)  # 右グラフの Y 軸範囲を設定（最大値の 120% を上限）
         # 左右グラフのそれぞれで最大値を再計算（左グラフの最大値から 80%、右グラフの最大値から 80% を計算）
         MaxYleft = max(DailySwapAndTradingProfit) * 0.8 if max(DailySwapAndTradingProfit) > 0 else 1_000_000
-        MaxYright = max(NotUsed) * 0.8 if max(NotUsed) > 0 else 1_000_000
+        MaxYright = max(CumulativeSwapAndTradingProfit) * 0.8 if max(CumulativeSwapAndTradingProfit) > 0 else 1_000_000
 
         """ 左側のグラフ """
         # スワップ収益の参考値を表示
@@ -1047,8 +1043,8 @@ print("\n運用中残高（元本を含む：最後の30日分）:")
 for i in range(max(0, len(DailySwapAndTradingProfit) - 30), len(DailySwapAndTradingProfit)):
     print("Day {0}: {1:,.0f}円".format(i + 1, DailySwapAndTradingProfit[i]))
 
-# コンソールに最後の30日分の未運用残高（元本を含む）を表示
-print("\n未運用残高（元本を含む：最後の30日分）:")
+# コンソールに最後の30日分の累積スワップ及びデイトレード収益（元本を含む）を表示
+print("\n累積スワップ及びデイトレード収益（元本を含む：最後の30日分）:")
 for i in range(max(0, len(CumulativeSwapAndTradingProfit) - 30), len(CumulativeSwapAndTradingProfit)):
     print("Day {0}: {1:,.0f}円".format(i + 1, CumulativeSwapAndTradingProfit[i]))
 
