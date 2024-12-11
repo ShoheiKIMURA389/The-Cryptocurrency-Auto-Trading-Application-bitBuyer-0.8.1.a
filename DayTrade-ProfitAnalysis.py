@@ -352,13 +352,21 @@ def ApplyDailyRiskFactors(LastSimulation = False):
     # デイトレード中の一定確率での損失発生
     LossProbability = 0.175  # 損失発生確率（17.5%）
     LossRate = 0.095  # 損失額を日次収益の 9.5% とする
-    if random.random() < LossProbability:  # 損失が発生するかどうかをランダムに決定
-        DailyIncome -= DailyInvestmentProfit * LossRate * Leverage  # レバレッジ適用
+    # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率ではなく成績に基づいたデイトレード利益率の場合
+    if ExpectedDailyTradeProfitInputYen == 0:  # 成績に基づいているため、リスク要素の損失確率と損失率を動的に計算
+        AdjustedLossProbability = LossProbability * (1.0 - TradeProfitRate)  # 利益率が高いほど損失確率を低減
+        AdjustedLossRate = LossRate * (1.0 - (TradeProfitRate / 2))  # 利益率が高いほど損失率を軽減
+        AdjustedLeverage = Leverage * max(0.5, (1.0 - TradeProfitRate))  # レバレッジを利益率に基づき調節（利益率が高いほどレバレッジを低減）
+        if random.random() < AdjustedLossProbability:  # 調節後の損失確率で判定
+            DailyIncome -= DailyInvestmentProfit * (AdjustedLossRate * AdjustedLeverage)  # 調節後のレバレッジを適用
+    else:  # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率の場合
+        if random.random() < LossProbability:  # 損失が発生するかどうかをランダムに決定
+            DailyIncome -= DailyInvestmentProfit * (LossRate * Leverage)  # レバレッジを適用
 
     # 時間帯によるボラティリティリスクの適用
     if Day % 24 in range(9, 18):  # 日本時間の昼間（午前9時から午後6時）
         LowVolatilityLossRate = 0.02  # ボラティリティが低い場合の日次収益に対する損失（2%）
-        DailyIncome -= DailyInvestmentProfit * LowVolatilityLossRate * Leverage  # レバレッジ適用
+        DailyIncome -= DailyInvestmentProfit * (LowVolatilityLossRate * Leverage)  # レバレッジを適用
 
     # 年に二回発生する大損失の適用
     if Day in [91, 273] and not LastSimulation:  # 年間の91日目（3ヶ月後）と273日目（9ヶ月後）
@@ -367,9 +375,9 @@ def ApplyDailyRiskFactors(LastSimulation = False):
         RemainingReinvestment -= RemainingReinvestment * MajorLossRate  # 再投資残高からレバレッジ考慮済みの損失額を減算
         # 累積スワップ及びデイトレード収益からレバレッジ考慮済みの損失額を減算
         TotalCumulativeSwapAndTradingProfit -= TotalCumulativeSwapAndTradingProfit * MajorLossRate
-        TotalInvestment = max(TotalInvestment, 0)  # 運用資金が負の値にならないように調整
-        RemainingReinvestment = max(RemainingReinvestment, 0)  # 再投資残高が負の値にならないように調整
-        # 累積スワップ及びデイトレード収益が負の値にならないように調整
+        TotalInvestment = max(TotalInvestment, 0)  # 運用資金が負の値にならないように調節
+        RemainingReinvestment = max(RemainingReinvestment, 0)  # 再投資残高が負の値にならないように調節
+        # 累積スワップ及びデイトレード収益が負の値にならないように調節
         TotalCumulativeSwapAndTradingProfit = max(TotalCumulativeSwapAndTradingProfit, 0)
 
 # 運用成績を計算する関数
