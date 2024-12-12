@@ -119,9 +119,7 @@ InvestmentStartDay = "2024/12/05"
 # このプログラムで運用を開始するための最初の投資金額を指定します。初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
 # 残りの 50% は未運用分（元本）として管理されます。この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
 # またこの金額に基づいて、次の設定項目である「現在の口座残高」との差額を算出し、日次デイトレード利益率の算出を行います。
-InitialInvestmentYen = 700000
-# 初期投資額の内、スワップポイント運用に回す割合（パーセントを整数で入力。50% なら 50）
-InitialSwapRatio = 50
+InitialInvestmentYen = 600000
 
 # 【現在の口座残高（円）】
 # 初期投資額を含めた現在の口座残高を入力します。
@@ -153,9 +151,10 @@ ZarSwapPerDay = 17
 
 # 【初期ロット数】
 # 最初に購入するロット数を通貨ペア毎に設定します。このロット数に基づいてスワップポイント収益が計算されます。
+# シミュレーション結果を表示するグラフに含める「元本に占めるスワップ収益用運用額の割合」は「初期投資額」「現在の口座残高」の低い方を基準に計算します。
 # 注意：レバレッジを参考に小さな値から計算を始めてください。この値を基に初期の必要証拠金が計算されます。
 # 注意：この値を設定しないとシミュレーションを行うことができません。
-# 　　　デイトレード収益の計算はこの値に基づきませんが、必要証拠金とスワップポイント収益の計算に必要です。
+# 　　　デイトレード収益の計算はこの値を直接参照しませんが、必要証拠金とスワップポイント収益の計算に必要です。
 MxnLots = 100  # MXN/JPY のロット数
 ZarLots = 0  # ZAR/JPY のロット数
 
@@ -166,14 +165,17 @@ MarginMaintenanceTarget = 300  # 証拠金維持率目標値（パーセント�
 
 # 【デイトレード設定】
 # 総口座残高の何％をデイトレードに使用するかを設定します（パーセントを整数で入力。100% なら 100）。
-# デイトレードをしない場合は 0 と設定します。
+# デイトレードをしない場合は 0 と設定します。ただし、この値はシミュレーションには直接的には影響しません。
+# 使用先：「初期デイトレード使用金額（シミュレーションの初期段階で参照します）」「グラフに表示するデイトレード収益の参考値」
+# シミュレーション中に「初期デイトレード使用金額」を未運用残高が超えた場合、この残高に基づいてデイトレード収益の計算を行います。
+# 備考：総口座残高に占める未運用残高の割合は「初期ロット数」に基づいて計算されます。
 DayTradingInvestmentRatio = 50
 
 # 【デイトレードによる予想追加収入（円/日）】
 # 毎日デイトレードを行うことで得られると想定される追加収入を設定します。この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
 # デイトレードの実績や市場状況に応じてこの値を調節することが推奨されます。
 # 既に取り引きを行っていて、これまでの設定項目の説明によってこの項目の入力の必要を促されない場合は、0 と設定してください。
-ExpectedDailyTradeProfitInputYen = 1000  # 1日当たりのデイトレードによる予想追加収益（円/日）
+ExpectedDailyTradeProfitInputYen = 100000 / 30  # 1日当たりのデイトレードによる予想追加収益（円/日）
 
 # 【追加投資設定】
 # 【毎月投入する追加投資額（円）】
@@ -190,10 +192,6 @@ MonthlyInvestment = 0  # 下の偶数月の設定と同時設定が可能です�
 # MXN/JPY 及び ZAR/JPY のロット比率に基づいてこの金額の半分を運用に回し、新たなロットを購入します。
 BiMonthlyInvestment = 50000  # 上の毎月の設定と同時設定が可能です。
 
-# 【追加投資の運用割合】
-# 追加投資の内、スワップポイント運用に回す割合（パーセントを整数で入力。50% なら 50）
-AdditionalSwapRatio = 50
-
 # 【年間収益がこの金額に達すると追加投資を中止】
 # 障害年金受給者を想定し、年収が 370 万円を超えると障害年金の支給が半減、472 万円を超えると停止されるため、
 # この金額を上限として追加投資を中止するよう設定しています。ただし、上限に達するまでに計画されている当年分の追加投資は実行されます。
@@ -204,7 +202,7 @@ InvestmentIncomeLimit = 3700000
 # シミュレーションを行う年数を設定してください。
 SimulationYears = 1  # 例：1年の場合は 1、3年の場合は 3
 # シミュレーションを行う年数に加えて、例えば税金差し引き後のシミュレーションを確認したい場合などに、任意の追加計算日数を設定できます。
-SimulationDays = 0  # 例：半年の場合は 181 日、三ヶ月の場合は 90 日、九ヶ月の場合は 273 日
+SimulationDays = 181  # 例：半年の場合は 181 日、三ヶ月の場合は 90 日、九ヶ月の場合は 273 日
 
 # 【グラフ表示設定】
 # グラフの縦軸（金額）の単位を "K"（1,000 単位）または "M"（1,000,000 単位）のいずれかから選びます。
@@ -224,21 +222,14 @@ def InitializeGlobals():
         なし。
     """
     # グローバル変数を宣言
-    global InitialSwapRatio, AdditionalSwapRatio, SwapRatio, InvestmentForTrading, DayTradingInvestmentRatio, DayTradingInvestment, \
-        TradeProfitRate, ExpectedDailyTradeProfit, MxnSwapPerYear, ZarSwapPerYear
-
-    InitialSwapRatio = InitialSwapRatio / 100 if InitialSwapRatio > 0 else 0  # 初期投資額の内、スワップポイント運用に回す割合を小数に変換
-    AdditionalSwapRatio = AdditionalSwapRatio / 100 if AdditionalSwapRatio > 0 else 0  # 追加投資の内、スワップポイント運用に回す割合を小数に変換
-    SwapRatio = (round(InitialSwapRatio + AdditionalSwapRatio) / 2) * 100  # スワップポイント運用に回す割合の平均値を算出
+    global DayTradingInvestmentRatio, DayTradingInvestment, TradeProfitRate, ExpectedDailyTradeProfit, MxnSwapPerYear, ZarSwapPerYear
 
     if InitialInvestmentYen > 0:  # 初期投資額が 1 以上であることを確認
-        # 初期投資額にスワップポイント運用に回す割合を掛け、残りを残高として設定
-        InvestmentForTrading = InitialInvestmentYen * (1 - InitialSwapRatio) if InitialSwapRatio > 0 else InitialInvestmentYen
         # デイトレード使用金額率を小数に変換
         DayTradingInvestmentRatio = DayTradingInvestmentRatio / 100 if DayTradingInvestmentRatio > 0 else 0
 
         # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率を計算
-        if DayTradingInvestmentRatio > 0:  # デイトレード使用金額率が 0 でないことを確認
+        if DayTradingInvestmentRatio > 0:  # デイトレード使用金額率が 1 以上であることを確認
             DayTradingInvestment = InitialInvestmentYen * DayTradingInvestmentRatio  # デイトレードに使用する金額を計算
             TradeProfitRate = ExpectedDailyTradeProfitInputYen / DayTradingInvestment \
                 if ExpectedDailyTradeProfitInputYen > 0 else 0  # デイトレード利益率を計算
@@ -324,11 +315,13 @@ def CalculateDailyIncome(LastSimulation = False):
     # 日次スワップ収益を計算する（補助関数を利用）
     DailyIncome = CalculateDailySwap(CurrentMxnLots, CurrentZarLots, MxnSwapPerDay, ZarSwapPerDay)
 
-    # デイトレード分の収益を計算して追加
-    # 初期デイトレード使用金額または必要証拠金の大きい方にデイトレード利益率を掛けて日次デイトレード収益を計算
-    DailyInvestmentProfit = max(DayTradingInvestment, TotalInvestment) * TradeProfitRate \
-        if LotCostLeveraged else max(DayTradingInvestment, TotalInvestment) * Leverage * TradeProfitRate
-    DailyIncome += DailyInvestmentProfit  # デイトレード収益を日次収益に加算
+    # デイトレード分の収益を計算して加算
+    UnusedBalance = RemainingReinvestment + TotalCumulativeSwapAndTradingProfit + UsedProfitForInvestment + \
+        AdditionalUnusedInvestment + UsedUnusedInvestment - TotalInvestment  # 未運用残高を算出
+    # 初期デイトレード使用金額または未運用残高の大きい方にデイトレード利益率を掛けて日次デイトレード収益を計算
+    DailyInvestmentProfit = max(DayTradingInvestment, UnusedBalance) * TradeProfitRate if LotCostLeveraged else \
+        max(DayTradingInvestment, UnusedBalance) * Leverage * TradeProfitRate
+    DailyIncome += DailyInvestmentProfit  # 日次収益にデイトレード収益を加算
 
 # 日次リスク要素を適用する関数
 def ApplyDailyRiskFactors(LastSimulation = False):
@@ -437,13 +430,13 @@ def CalculateSwapAndTradingProfitGrowth():
         - 証拠金維持率が高すぎる場合、運用効率が低下する可能性があるため、再投資の際には証拠金維持率の目標値を基準とした調整が行われます。
 
         Args:
-            DailyIncome (float): 日次スワップ及びデイトレード収益。収益の 50% を再投資用の資金として充当。
+            DailyIncome (float): 日次スワップ及びデイトレード収益。
             TotalInvestment (float): 運用残高（必要証拠金）。
             TotalCumulativeSwapAndTradingProfit (float): 「累積スワップ及びデイトレード収益」。
             UsedProfitForInvestment (float): 運用済み「累積スワップ及びデイトレード収益」。
             Leverage (int): レバレッジ。
             MarginMaintenanceTarget (int): 目標証拠金維持率（300% なら 300）。
-            RemainingReinvestment (float): 再投資残高（運用残高の追加準備金、レバレッジ未適用）。残っている再投資用残高に日次収益の 50% を加算。
+            RemainingReinvestment (float): 再投資残高（運用残高の追加準備金、レバレッジ未適用）。
             AdditionalUnusedInvestment (float): 「増資未運用残高（累積）」。
             UsedUnusedInvestment (float): 運用済み「増資未運用残高（累積）」。
             CurrentMxnLots (int): 現在保有している MXN/JPY のロット数。
@@ -464,7 +457,7 @@ def CalculateSwapAndTradingProfitGrowth():
                 - CurrentZarLots (int): 更新された ZAR/JPY のロット数。
         """
         # 補助関数：証拠金維持率を計算
-        def CalculateMarginMaintenanceRate(TotalInvestment, RemainingReinvestment, MarginMaintenanceTarget,
+        def CalculateMarginMaintenanceRate(TotalInvestment, RemainingReinvestment, MarginMaintenanceTarget, DailyIncome,
             TotalCumulativeSwapAndTradingProfit, UsedProfitForInvestment, AdditionalUnusedInvestment, UsedUnusedInvestment):
             """
             現在の証拠金維持率を計算する関数。
@@ -476,6 +469,7 @@ def CalculateSwapAndTradingProfitGrowth():
                 TotalInvestment (float): 運用残高（必要証拠金）。
                 RemainingReinvestment (float): 再投資残高（運用残高の追加準備金、レバレッジ未適用）。
                 MarginMaintenanceTarget (int): 目標証拠金維持率（300% なら 300）。
+                DailyIncome (float): 日次スワップ及びデイトレード収益。
                 TotalCumulativeSwapAndTradingProfit (float): 「累積スワップ及びデイトレード収益」。
                 UsedProfitForInvestment (float): 運用済み「累積スワップ及びデイトレード収益」。
                 AdditionalUnusedInvestment (float): 「増資未運用残高（累積）」。
@@ -492,7 +486,7 @@ def CalculateSwapAndTradingProfitGrowth():
             # 利用可能な未運用残高を計算
             ProfitAvailable = TotalCumulativeSwapAndTradingProfit - UsedProfitForInvestment  # 累計から運用中金額を差し引く
             AdditionalAvailable = AdditionalUnusedInvestment - UsedUnusedInvestment  # 累計から運用中金額を差し引く
-            AvailableFunds = ProfitAvailable + AdditionalAvailable  # 未運用残高を合算
+            AvailableFunds = ProfitAvailable + AdditionalAvailable + DailyIncome  # 未運用残高を合算
 
             AccountTotalBalance = TotalInvestment + RemainingReinvestment + AvailableFunds  # 総口座残高を計算
 
@@ -602,12 +596,19 @@ def CalculateSwapAndTradingProfitGrowth():
             return RemainingReinvestment, UsedProfitForInvestment, UsedUnusedInvestment  # 計算結果を返す
 
         """ PerformReinvestment() の記述 """
-        Reinvestment = DailyIncome * 0.5  # 再投資額を日次収益の 50% として計算
-        RemainingReinvestment += Reinvestment  # 再投資額を再投資残高に加算
-
         # 証拠金維持率を計算（補助関数を利用）
         MarginMaintenanceRate = CalculateMarginMaintenanceRate(TotalInvestment, RemainingReinvestment, MarginMaintenanceTarget,
-            TotalCumulativeSwapAndTradingProfit, UsedProfitForInvestment, AdditionalUnusedInvestment, UsedUnusedInvestment)
+            DailyIncome, TotalCumulativeSwapAndTradingProfit, UsedProfitForInvestment, AdditionalUnusedInvestment, UsedUnusedInvestment)
+
+        # 日次スワップ及びデイトレード収益を再投資残高（RemainingReinvestment）に加算：
+        # - 再投資額は、最低でも日次収入 (DailyIncome) の 50% を保証します。
+        # - 証拠金維持率 (MarginMaintenanceRate) が目標証拠金維持率 (MarginMaintenanceTarget) を超えている場合は、
+        #   その超過率に応じた金額を再投資額として計算し、それを再投資残高に加算します。
+        # - 計算式：
+        #   1. DailyIncome * 0.5（最低保証額）
+        #   2. DailyIncome * ((MarginMaintenanceRate - MarginMaintenanceTarget) / 100)（動的調節分）
+        #   上記二つの値の内大きい方を選び、それを再投資残高 RemainingReinvestment に加算します。
+        RemainingReinvestment += max(DailyIncome * 0.5, DailyIncome * ((MarginMaintenanceRate - MarginMaintenanceTarget) / 100))
 
         # 証拠金維持率が目標値を超えている場合、未運用累積スワップ及びデイトレード収益、増資未運用残高から再投資残高に資金を移動（補助関数を利用）
         if MarginMaintenanceRate > MarginMaintenanceTarget:
@@ -757,14 +758,14 @@ def CalculateSwapAndTradingProfitGrowth():
         """ PerformMonthlyInvestment() の記述 """
         # 毎月26日に追加投資を行う
         if Day % 30 == 26:  # 毎月26日かどうかを判定
-            RemainingReinvestment += MonthlyInvestment * AdditionalSwapRatio  # 追加投資の内、スワップポイント運用に回す割合を再投資残高に加算
-            AdditionalUnusedInvestment += MonthlyInvestment * (1 - AdditionalSwapRatio)  # 残った金額を未運用残高に加算
+            RemainingReinvestment += MonthlyInvestment * InvestmentRatioForSwap  # 追加投資中スワップポイント運用に回す割合を再投資残高に加算
+            AdditionalUnusedInvestment += MonthlyInvestment * (1 - InvestmentRatioForSwap)  # 残った金額を未運用残高に加算
             ProcessInvestment()  # 補助関数を利用して、再投資残高に基づき、利用可能な証拠金を計算し、比率に従って MXN 及び ZAR に投資を行う
 
         # 偶数月16日に追加投資を行う
         if Day % 30 == 15 and (Day // 30 + 1) % 2 == 0:  # 偶数月16日かどうかを判定
-            RemainingReinvestment += BiMonthlyInvestment * AdditionalSwapRatio  # 追加投資の内、スワップポイント運用に回す割合を再投資残高に加算
-            AdditionalUnusedInvestment += BiMonthlyInvestment * (1 - AdditionalSwapRatio)  # 残った金額を未運用残高に加算
+            RemainingReinvestment += BiMonthlyInvestment * InvestmentRatioForSwap  # 追加投資中スワップポイント運用に回す割合を再投資残高に加算
+            AdditionalUnusedInvestment += BiMonthlyInvestment * (1 - InvestmentRatioForSwap)  # 残った金額を未運用残高に加算
             ProcessInvestment()  # 補助関数を利用して、再投資残高に基づき、利用可能な証拠金を計算し、比率に従って MXN 及び ZAR に投資を行う
 
         return TotalInvestment, RemainingReinvestment, AdditionalUnusedInvestment, CurrentMxnLots, CurrentZarLots  # 更新後の状態を返す
@@ -799,17 +800,19 @@ def CalculateSwapAndTradingProfitGrowth():
         return Income - TaxAmount  # 税金引き後の収益金額を返す
 
     """ CalculateSwapAndTradingProfitGrowth() の記述 """
+    # 初期化：グローバル変数を宣言
+    global InitialRequiredMargin, TotalInvestment, InvestmentRatioForSwap, RemainingReinvestment, TotalCumulativeSwapAndTradingProfit, \
+        Day, DailyIncome, DailyInvestmentProfit, UsedProfitForInvestment, AdditionalUnusedInvestment, UsedUnusedInvestment, \
+        CurrentMxnLots, CurrentZarLots
+
     # 初期必要証拠金計算のために、設定されたロット数と1ロットのコスト、レバレッジを使用
     InitialRequiredMargin = ((Mxn1LotCost * MxnLots) + (Zar1LotCost * ZarLots))  # 1ロットのコストにロット数をかけて運用中の金額を算出
     if not LotCostLeveraged:  # 1ロット当たりのコストにレバレッジが適用されていない場合
         InitialRequiredMargin = InitialRequiredMargin / Leverage  # 必要証拠金をレバレッジで割って求める
 
-    # 初期化：グローバル変数を宣言
-    global TotalInvestment, RemainingReinvestment, TotalCumulativeSwapAndTradingProfit, Day, DailyIncome, DailyInvestmentProfit, \
-        CurrentMxnLots, CurrentZarLots
-
     # 初期化：各種変数
     TotalInvestment = InitialRequiredMargin  # 初期必要証拠金を運用残高として代入
+    InvestmentRatioForSwap = InitialRequiredMargin / min(InitialInvestmentYen, CurrentBalance)  # 元本に占めるスワップ収益用運用額の割合
     RemainingReinvestment = 0  # 再投資残高を初期化
     AdditionalUnusedInvestment = 0  # 増資未運用残高を初期化
     TradeDays = 0  # 実際に取引が可能な日数をカウントする変数を初期化
@@ -940,9 +943,11 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
     # 運用中残高のグラフ（左側）
     # 未運用残高をプロットし、凡例に「Total Investment Amount for Swap (With n% Principal)」を設定
     axes[0].plot(Years, DailySwapAndTradingProfit, marker = "o",
-        label = "Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), linestyle = "--", color = "blue")
+        label = "Total Investment Amount for Swap (With {0}% Principal)".format(round(InvestmentRatioForSwap * 100)), linestyle = "--",
+        color = "blue")
     # グラフタイトルを設定
-    axes[0].set_title("Total Investment Amount for Swap (With {0}% Principal)".format(int(SwapRatio)), fontsize = 16)
+    axes[0].set_title("Total Investment Amount for Swap (With {0}% Principal)".format(round(InvestmentRatioForSwap * 100)),
+        fontsize = 16)
     axes[0].set_xlabel("Year (already taxed)", fontsize = 14)  # X 軸ラベルを設定
     if IfSelectedK:
         axes[0].set_ylabel("In Use Swap & Day Trading Income (JPY, in K)", fontsize = 14)  # Y 軸ラベルを設定
@@ -984,7 +989,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYleft * 1.18,  # テキストの Y 座標位置を最大値の 118% に配置（上部）
             # スワップ収益の年間参考値をフォーマットして表示
-            "Swap Reference:\n1MXN: {0:,} JPY/year\n1ZAR: {1:,} JPY/year".format(MxnSwapPerYear, ZarSwapPerYear),
+            "Swap Reference:\nA lot of MXN: {0:,} JPY/year\nA lot of ZAR: {1:,} JPY/year".format(MxnSwapPerYear, ZarSwapPerYear),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "blue",  # テキストの色を青に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
@@ -995,7 +1000,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYleft * 1.03,  # テキストの Y 座標位置を最大値の 103% に配置（スワップ収益参考値の少し下）
             # 投資額と n% が運用されていることをフォーマットして表示
-            "Current Balance:\n{0:,} JPY ({1}% used)".format(CurrentBalance, round(InitialSwapRatio * 100)),
+            "Current Balance:\n{0:,} JPY ({1}% used)".format(CurrentBalance, round(InitialRequiredMargin / CurrentBalance * 100)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "green",  # テキストの色を緑に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
@@ -1006,7 +1011,8 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             0.05,  # テキストの X 座標位置を指定（左寄り）
             MaxYleft * 0.88,  # テキストの Y 座標位置を最大値の 88% に配置（投資額表示の少し下）
             # デイトレード収益と 50% が運用されていることをフォーマットして表示
-            "Profit / Day Trading:\n{0:,} JPY/day (50% used)".format(int(ExpectedDailyTradeProfit)),
+            "Profit / Day Trading:\n{0:,} JPY/day ({1}% used)".format(
+                int(ExpectedDailyTradeProfit), round(InvestmentRatioForSwap * 100)),
             fontsize = 12,  # フォントサイズを 12 ポイントに設定
             color = "purple",  # テキストの色を紫に設定
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
