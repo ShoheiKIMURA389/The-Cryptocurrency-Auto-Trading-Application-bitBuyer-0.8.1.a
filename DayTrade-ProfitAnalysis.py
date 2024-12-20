@@ -119,7 +119,7 @@ InvestmentStartDay = "2024/12/05"
 # このプログラムで運用を開始するための最初の投資金額を指定します。初期投資額の 50% を運用資金として使用し、スワップポイント収益の計算に利用します。
 # 残りの 50% は未運用分（元本）として管理されます。この分割は、証拠金維持率を充分に確保し、強制ロスカットのリスクを軽減するために行われます。
 # またこの金額に基づいて、次の設定項目である「現在の口座残高」との差額を算出し、日次デイトレード利益率の算出を行います。
-InitialInvestmentYen = 600000
+InitialInvestmentYen = 800000 + (50000 + (1598980 + 421487))
 
 # 【現在の口座残高（円）】
 # 初期投資額を含めた現在の口座残高を入力します。
@@ -127,7 +127,7 @@ InitialInvestmentYen = 600000
 # 注意：この設定値が初期投資額よりも高いと、この設定値を基にデイトレード利益率の計算を自動で行います。デイトレードを行う場合、
 # 利益率の高い方を選択しますので、設定項目「デイトレードによる予想追加収入」に低い値を設定する場合は初期投資額と同額の値を設定することを推奨します。
 # 初期投資額と現在の口座残高に大きな乖離があると、大きな利益率を算出してしまいます。
-CurrentBalance = 700000
+CurrentBalance = 3563003 + 2000
 
 # 【レバレッジ】
 # 適用するレバレッジの倍率を整数で設定します（25倍なら25）。
@@ -136,7 +136,7 @@ Leverage = 25
 # 【1ロット購入に必要な金額】
 # 各通貨の1ロット（DMM FX の場合：1万通貨）を購入するために必要な日本円の金額を指定します。
 # この値は実際の為替レートを基に設定され、再投資や追加投資のロット数計算に使用されます。
-Mxn1LotCost = 3025  # MXN/JPY
+Mxn1LotCost = 3081  # MXN/JPY
 Zar1LotCost = 3439  # ZAR/JPY
 # 1ロット購入金額がレバレッジ適用後の価格である場合は以下を True、そうでなければ False にします。
 # レバレッジが適用されていない場合、1通貨の対円価格を最小取引単位倍した価格が1ロットの購入に必要な価格とほとんど等しくなります。
@@ -155,7 +155,7 @@ ZarSwapPerDay = 17
 # 注意：レバレッジを参考に小さな値から計算を始めてください。この値を基に初期の必要証拠金が計算されます。
 # 注意：この値を設定しないとシミュレーションを行うことができません。
 # 　　　デイトレード収益の計算はこの値を直接参照しませんが、必要証拠金とスワップポイント収益の計算に必要です。
-MxnLots = 100  # MXN/JPY のロット数
+MxnLots = 600  # MXN/JPY のロット数
 ZarLots = 0  # ZAR/JPY のロット数
 
 # 【証拠金維持率の目標値（%）】
@@ -169,13 +169,13 @@ MarginMaintenanceTarget = 300  # 証拠金維持率目標値（パーセント�
 # 使用先：「初期デイトレード使用金額（シミュレーションの初期段階で参照します）」「グラフに表示するデイトレード収益の参考値」
 # シミュレーション中に「初期デイトレード使用金額」を未運用残高が超えた場合、この残高に基づいてデイトレード収益の計算を行います。
 # 備考：総口座残高に占める未運用残高の割合は「初期ロット数」に基づいて計算されます。
-DayTradingInvestmentRatio = 50
+DayTradingInvestmentRatio = 66
 
 # 【デイトレードによる予想追加収入（円/日）】
 # 毎日デイトレードを行うことで得られると想定される追加収入を設定します。この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
 # デイトレードの実績や市場状況に応じてこの値を調節することが推奨されます。
 # 既に取り引きを行っていて、これまでの設定項目の説明によってこの項目の入力の必要を促されない場合は、0 と設定してください。
-ExpectedDailyTradeProfitInputYen = 100000 / 30  # 1日当たりのデイトレードによる予想追加収益（円/日）
+ExpectedDailyTradeProfitInputYen = 8000 / 31  # 1日当たりのデイトレードによる予想追加収益（円/日）
 
 # 【追加投資設定】
 # 【毎月投入する追加投資額（円）】
@@ -190,7 +190,7 @@ MonthlyInvestment = 0  # 下の偶数月の設定と同時設定が可能です�
 # この設定は、日本の年金受給者を想定しており、偶数月（2月、4月、6月……）に年金が支給されるタイミングで、一部の資金を追加投資に充当する前提で計算を行います。
 # 実際の日本の公的年金は「偶数月の15日」に支給されますが、16日を投入日とすることで、資金投入の判断を行う時間を確保することを目的としています。
 # MXN/JPY 及び ZAR/JPY のロット比率に基づいてこの金額の半分を運用に回し、新たなロットを購入します。
-BiMonthlyInvestment = 50000  # 上の毎月の設定と同時設定が可能です。
+BiMonthlyInvestment = 0  # 上の毎月の設定と同時設定が可能です。
 
 # 【年間収益がこの金額に達すると追加投資を中止】
 # 障害年金受給者を想定し、年収が 370 万円を超えると障害年金の支給が半減、472 万円を超えると停止されるため、
@@ -328,13 +328,23 @@ def ApplyDailyRiskFactors(LastSimulation = False):
     """
     デイトレードのシミュレーションにおける日次リスク要素を適用する関数。
 
-    この関数は以下の三つのリスク要素を考慮して収益や投資額を調整します：
-    1. デイトレード中の一定確率での損失発生。
-    2. 時間帯に応じたボラティリティリスクの変動。
-    3. 年に二回発生する大損失。
+    この関数は、ランダム性を含むリスク要素の計算を 10 回試行し、それぞれの試行結果から最悪値（最大損失）と平均値を収集します。その後、これらの結果を統合して
+    リスク評価を行い、グローバル変数に反映します。
+
+    主な処理:
+    1. 10 回の試行毎にリスク計算を行い、日次収益及び累積収益をシミュレート。
+    2. 各試行結果から最悪値（最大損失）と平均値を計算。
+    3. 最悪値と平均値を加重平均で統合し、バランスの取れたリスク評価を提供。
+    4. 計算結果をグローバル変数 DailyIncome と TotalCumulativeSwapAndTradingProfit に反映。
+
+    リスク評価の特徴:
+    - デイトレード中の一定確率での損失発生をシミュレートします（損失確率や損失率を動的に調整）。
+    - 時間帯によるボラティリティリスクを考慮し、特定時間帯に損失を適用。
+    - 年に二回発生する大損失イベントをシミュレートし、大きな市場変動を反映。
+
+    この設計により、リスクが過小評価されることを防ぎ、現実的なリスク評価を行います。
 
     注意:
-    - "DailyInvestmentProfit"、"Leverage"、"Day"、"TotalInvestment"、"RemainingReinvestment" はグローバル変数として使用されます。
     - 大損失部分では、損失率は既にレバレッジを考慮した値として計算されている前提です。
 
     Parameters:
@@ -344,39 +354,75 @@ def ApplyDailyRiskFactors(LastSimulation = False):
         None
     """
     import random  # ランダムな数値や確率的な要素を生成するための標準ライブラリ
+
     # グローバル変数を宣言
     global DailyIncome, DailyInvestmentProfit, Day, TotalInvestment, RemainingReinvestment, TotalCumulativeSwapAndTradingProfit
 
-    # デイトレード中の一定確率での損失発生
-    LossProbability = 0.175  # 損失発生確率（17.5%）
-    LossRate = 0.095  # 損失額を日次収益の 9.5% とする
-    # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率ではなく成績に基づいたデイトレード利益率の場合
-    if ExpectedDailyTradeProfitInputYen == 0:  # 成績に基づいているため、リスク要素の損失確率と損失率を動的に計算
-        AdjustedLossProbability = LossProbability * (1.0 - TradeProfitRate)  # 利益率が高いほど損失確率を低減
-        AdjustedLossRate = LossRate * (1.0 - (TradeProfitRate / 2))  # 利益率が高いほど損失率を軽減
-        AdjustedLeverage = Leverage * max(0.5, (1.0 - TradeProfitRate))  # レバレッジを利益率に基づき調節（利益率が高いほどレバレッジを低減）
-        if random.random() < AdjustedLossProbability:  # 調節後の損失確率で判定
-            DailyIncome -= DailyInvestmentProfit * (AdjustedLossRate * AdjustedLeverage)  # 調節後のレバレッジを適用
-    else:  # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率の場合
-        if random.random() < LossProbability:  # 損失が発生するかどうかをランダムに決定
-            DailyIncome -= DailyInvestmentProfit * (LossRate * Leverage)  # レバレッジを適用
+    # 最悪の結果と平均値を保持するためのローカル変数
+    WorstDailyIncome = DailyIncome  # 最悪の日次スワップ及びデイトレード収益を初期化
+    WorstTotalCumulativeProfit = TotalCumulativeSwapAndTradingProfit  # 最悪の累積スワップ及びデイトレード収益を初期化
+    DailyIncomeSum = 0  # 日次スワップ及びデイトレード収益の合計
+    TotalCumulativeProfitSum = 0  # 累積スワップ及びデイトレード収益の合計
 
-    # 時間帯によるボラティリティリスクの適用
-    if Day % 24 in range(9, 18):  # 日本時間の昼間（午前9時から午後6時）
-        LowVolatilityLossRate = 0.02  # ボラティリティが低い場合の日次収益に対する損失（2%）
-        DailyIncome -= DailyInvestmentProfit * (LowVolatilityLossRate * Leverage)  # レバレッジを適用
+    for _ in range(10):
+        # 保存しておく初期値を設定
+        OriginalDailyIncome = DailyIncome  # 日次スワップ及びデイトレード収益の元の値を保存
+        OriginalTotalCumulativeProfit = TotalCumulativeSwapAndTradingProfit  # 累積スワップ及びデイトレード収益の元の値を保存
 
-    # 年に二回発生する大損失の適用
-    if Day in [91, 273] and not LastSimulation:  # 年間の91日目（3ヶ月後）と273日目（9ヶ月後）
-        MajorLossRate = 0.3  # 資金の 30% を喪失する大損失
-        TotalInvestment -= TotalInvestment * MajorLossRate  # 運用資金からレバレッジ考慮済みの損失額を減算
-        RemainingReinvestment -= RemainingReinvestment * MajorLossRate  # 再投資残高からレバレッジ考慮済みの損失額を減算
-        # 累積スワップ及びデイトレード収益からレバレッジ考慮済みの損失額を減算
-        TotalCumulativeSwapAndTradingProfit -= TotalCumulativeSwapAndTradingProfit * MajorLossRate
-        TotalInvestment = max(TotalInvestment, 0)  # 運用資金が負の値にならないように調節
-        RemainingReinvestment = max(RemainingReinvestment, 0)  # 再投資残高が負の値にならないように調節
-        # 累積スワップ及びデイトレード収益が負の値にならないように調節
-        TotalCumulativeSwapAndTradingProfit = max(TotalCumulativeSwapAndTradingProfit, 0)
+        # デイトレード中の一定確率での損失発生
+        LossProbability = 0.175  # 損失発生確率（17.5%）
+        LossRate = 0.095  # 損失額を日次収益の 9.5% とする
+
+        if ExpectedDailyTradeProfitInputYen == 0:  # 成績に基づいているため、リスク要素の損失確率と損失率を動的に計算
+            AdjustedLossProbability = LossProbability * (1.0 - TradeProfitRate)  # 利益率が高いほど損失確率を低減
+            AdjustedLossRate = LossRate * (1.0 - (TradeProfitRate / 2))  # 利益率が高いほど損失率を軽減
+            AdjustedLeverage = Leverage * max(0.5, (1.0 - TradeProfitRate))  # レバレッジを利益率に基づき調節（利益率が高いほどレバレッジを低減）
+            if random.random() < AdjustedLossProbability:  # 調節後の損失確率で判定
+                DailyIncome -= DailyInvestmentProfit * (AdjustedLossRate * AdjustedLeverage)  # 調節後のレバレッジを適用
+        else:  # 初期設定「デイトレードによる予想追加収入」に基づいたデイトレード利益率の場合
+            if random.random() < LossProbability:  # 損失が発生するかどうかをランダムに決定
+                DailyIncome -= DailyInvestmentProfit * (LossRate * Leverage)  # レバレッジを適用
+
+        # 時間帯によるボラティリティリスクの適用
+        if Day % 24 in range(9, 18):  # 日本時間の昼間（午前9時から午後6時）
+            LowVolatilityLossRate = 0.02  # ボラティリティが低い場合の日次収益に対する損失（2%）
+            DailyIncome -= DailyInvestmentProfit * (LowVolatilityLossRate * Leverage)  # レバレッジを適用
+
+        # 年に二回発生する大損失の適用
+        if Day in [91, 273] and not LastSimulation:  # 年間の91日目（3ヶ月後）と273日目（9ヶ月後）
+            MajorLossRate = 0.3  # 資金の 30% を喪失する大損失
+            TotalInvestment -= TotalInvestment * MajorLossRate  # 運用資金からレバレッジ考慮済みの損失額を減算
+            RemainingReinvestment -= RemainingReinvestment * MajorLossRate  # 再投資残高からレバレッジ考慮済みの損失額を減算
+            # 累積スワップ及びデイトレード収益からレバレッジ考慮済みの損失額を減算
+            TotalCumulativeSwapAndTradingProfit -= TotalCumulativeSwapAndTradingProfit * MajorLossRate
+            TotalInvestment = max(TotalInvestment, 0)  # 運用資金が負の値にならないように調節
+            RemainingReinvestment = max(RemainingReinvestment, 0)  # 再投資残高が負の値にならないように調節
+            # 累積スワップ及びデイトレード収益が負の値にならないように調節
+            TotalCumulativeSwapAndTradingProfit = max(TotalCumulativeSwapAndTradingProfit, 0)
+
+        # 最悪の収益を更新
+        if DailyIncome < WorstDailyIncome:
+            WorstDailyIncome = DailyIncome  # 最悪の日次スワップ及びデイトレード収益を更新
+        if TotalCumulativeSwapAndTradingProfit < WorstTotalCumulativeProfit:
+            WorstTotalCumulativeProfit = TotalCumulativeSwapAndTradingProfit  # 最悪の累積スワップ及びデイトレード収益を更新
+
+        # 平均値の計算のために各収益を加算
+        DailyIncomeSum += DailyIncome
+        TotalCumulativeProfitSum += TotalCumulativeSwapAndTradingProfit
+
+        # 次のイテレーションのため状態を元に戻す
+        DailyIncome = OriginalDailyIncome  # 日次スワップ及びデイトレード収益を元に戻す
+        TotalCumulativeSwapAndTradingProfit = OriginalTotalCumulativeProfit  # 累積スワップ及びデイトレード収益を元に戻す
+
+    # 平均値を計算
+    AverageDailyIncome = DailyIncomeSum / 10  # 日次スワップ及びデイトレード収益の平均値
+    AverageTotalCumulativeProfit = TotalCumulativeProfitSum / 10  # 累積スワップ及びデイトレード収益の平均値
+
+    # グローバル変数に反映（平均値と最悪値の加重平均を適用）
+    Alpha = 0.7  # 平均値と最悪値の重み（0.5 = 平均値と最悪値が同等、0.9 = 平均値を重視）
+    DailyIncome = Alpha * AverageDailyIncome + (1 - Alpha) * WorstDailyIncome  # 日次スワップ及びデイトレード収益を更新
+    # 累積スワップ及びデイトレード収益を更新
+    TotalCumulativeSwapAndTradingProfit = Alpha * AverageTotalCumulativeProfit + (1 - Alpha) * WorstTotalCumulativeProfit
 
 # 運用成績を計算する関数
 def CalculateSwapAndTradingProfitGrowth():
@@ -816,6 +862,8 @@ def CalculateSwapAndTradingProfitGrowth():
     RemainingReinvestment = 0  # 再投資残高を初期化
     AdditionalUnusedInvestment = 0  # 増資未運用残高を初期化
     TradeDays = 0  # 実際に取引が可能な日数をカウントする変数を初期化
+    DailyIncome = 0  # 日次スワップ及びデイトレード収益を初期化
+    DailyInvestmentProfit = 0  # デイトレード収益を初期化
     TotalCumulativeSwapAndTradingProfit = 0  # 累積スワップ及びデイトレード収益を初期化
     PreviousCumulativeSwapAndTradingProfit = 0  # 前年の累積スワップ及びデイトレード収益を記録する変数を初期化
     UsedProfitForInvestment = 0  # 運用済み「累積スワップ及びデイトレード収益」を初期化
@@ -1063,13 +1111,6 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
             bbox = dict(facecolor = "white", alpha = 0.8, edgecolor = "gray")  # テキストボックスの背景色を白、透明度を 0.8、枠線の色を灰色に設定
         )
 
-        # 最終月の翌月の月収を概算参考値として表示するための計算
-        MonthlyIncome = 0  # 最終月の翌月の月収を累積する変数を初期化
-        for ForCalculateMonthDailyIncome in range(1, 31):
-            CalculateDailyIncome()  # 日次スワップ収益とデイトレード収益を計算（必要な値は全てグローバル変数として定義）
-            ApplyDailyRiskFactors(LastSimulation = True)  # 日次リスク要素を適用（必要な値は全てグローバル変数として定義）
-            MonthlyIncome += DailyIncome  # 日次収益を月収に加算
-
         # 月収の参考値を表示
         axes[1].text(
             0.05,  # テキストの X 座標位置を指定（左寄り）
@@ -1102,6 +1143,13 @@ for i in range(max(0, len(DailySwapAndTradingProfit) - 30), len(DailySwapAndTrad
 print("\n累積スワップ及びデイトレード収益（元本を含む：最後の30日分）:")
 for i in range(max(0, len(CumulativeSwapAndTradingProfit) - 30), len(CumulativeSwapAndTradingProfit)):
     print("Day {0}: {1:,.0f}円".format(i + 1, CumulativeSwapAndTradingProfit[i]))
+
+# 最終月の翌月の月収を概算参考値として表示するための計算
+MonthlyIncome = 0  # 最終月の翌月の月収を累積する変数を初期化
+for ForCalculateMonthDailyIncome in range(1, 31):
+    CalculateDailyIncome()  # 日次スワップ収益とデイトレード収益を計算（必要な値は全てグローバル変数として定義）
+    ApplyDailyRiskFactors(LastSimulation = True)  # 日次リスク要素を適用（必要な値は全てグローバル変数として定義）
+    MonthlyIncome += DailyIncome  # 日次収益を月収に加算
 
 # グラフ描画
 PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit)
