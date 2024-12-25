@@ -74,7 +74,7 @@
     4.1 VS Code をインストール:
         - 公式サイトからインストールしてください。
           URL: https://code.visualstudio.com
-    
+
     4.2 Python 拡張機能をインストール:
         - VS Codeを開き、左側の「拡張機能」アイコンをクリックします。
         - 検索バーに "Python" と入力し、Microsoft が提供する Python 拡張機能をインストールします。
@@ -127,7 +127,7 @@ InitialInvestmentYen = 800000 + (50000 + (1598980 + 421487))
 # 注意：この設定値が初期投資額よりも高いと、この設定値を基にデイトレード利益率の計算を自動で行います。デイトレードを行う場合、
 # 利益率の高い方を選択しますので、設定項目「デイトレードによる予想追加収入」に低い値を設定する場合は初期投資額と同額の値を設定することを推奨します。
 # 初期投資額と現在の口座残高に大きな乖離があると、大きな利益率を算出してしまいます。
-CurrentBalance = 3563003 + 2000
+CurrentBalance = 3760443 + 2000
 
 # 【レバレッジ】
 # 適用するレバレッジの倍率を整数で設定します（25倍なら25）。
@@ -169,7 +169,7 @@ MarginMaintenanceTarget = 300  # 証拠金維持率目標値（パーセント�
 # 使用先：「初期デイトレード使用金額（シミュレーションの初期段階で参照します）」「グラフに表示するデイトレード収益の参考値」
 # シミュレーション中に「初期デイトレード使用金額」を未運用残高が超えた場合、この残高に基づいてデイトレード収益の計算を行います。
 # 備考：総口座残高に占める未運用残高の割合は「初期ロット数」に基づいて計算されます。
-DayTradingInvestmentRatio = 66
+DayTradingInvestmentRatio = 50
 
 # 【デイトレードによる予想追加収入（円/日）】
 # 毎日デイトレードを行うことで得られると想定される追加収入を設定します。この値はスワップポイント収益に加算され、総収益の予測計算に使用されます。
@@ -825,25 +825,36 @@ def CalculateSwapAndTradingProfitGrowth():
             Income (float): 課税対象となる総収益金額（JPY）
 
         Returns:
-            float: 税金引き後の収益金額（JPY）
+            float: 税金差し引き後の収益金額（JPY）
         """
-        if Income <= 1_949_000:  # 1,949,000 円以下の所得に適用される税率
-            TaxRate = 0.05  # 税率：5%
-        elif Income <= 3_299_000:  # 3,299,000 円以下の所得に適用される税率
-            TaxRate = 0.10  # 税率：10%
-        elif Income <= 6_949_000:  # 6,949,000 円以下の所得に適用される税率
-            TaxRate = 0.20  # 税率：20%
-        elif Income <= 8_999_000:  # 8,999,000 円以下の所得に適用される税率
-            TaxRate = 0.23  # 税率：23%
-        elif Income <= 17_999_000:  # 17,999,000 円以下の所得に適用される税率
-            TaxRate = 0.33  # 税率：33%
-        elif Income <= 39_999_000:  # 39,999,000 円以下の所得に適用される税率
-            TaxRate = 0.40  # 税率：40%
-        else:  # それ以上の所得に適用される税率
-            TaxRate = 0.45  # 税率：45%
+        # 所得に対する累進課税方式に基づいて税額を計算
+        # 累進課税方式では、各所得階層毎に異なる税率が適用される
+        TaxBrackets = [
+            (1_949_000, 0.05),   # 1,949,000 円以下の税率：5%
+            (3_299_000, 0.10),   # 3,299,000 円以下の税率：10%
+            (6_949_000, 0.20),   # 6,949,000 円以下の税率：20%
+            (8_999_000, 0.23),   # 8,999,000 円以下の税率：23%
+            (17_999_000, 0.33),  # 17,999,000 円以下の税率：33%
+            (39_999_000, 0.40),  # 39,999,000 円以下の税率：40%
+            (float('inf'), 0.45) # それ以上の税率：45%
+        ]
 
-        TaxAmount = Income * TaxRate  # 税額を計算
-        return Income - TaxAmount  # 税金引き後の収益金額を返す
+        TaxAmount = 0  # 累進税額の初期化
+        PreviousBracketLimit = 0  # 前の階層の上限を管理
+
+        for BracketLimit, Rate in TaxBrackets:
+            if Income > BracketLimit:
+                # 現在の階層全体に適用される税金を計算
+                TaxAmount += (BracketLimit - PreviousBracketLimit) * Rate
+            else:
+                # 現在の階層に収まる部分のみに適用される税金を計算
+                TaxAmount += (Income - PreviousBracketLimit) * Rate
+                break  # 全ての課税が完了したら終了
+
+            # 次の階層のために上限を更新
+            PreviousBracketLimit = BracketLimit
+
+        return Income - TaxAmount  # 税金差し引き後の収益金額を返す
 
     """ CalculateSwapAndTradingProfitGrowth() の記述 """
     # 初期化：グローバル変数を宣言
@@ -957,7 +968,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         Parameters:
             X (int): 表示する値。
             _ (Any): 不使用（軸の位置用パラメータ）。
-        
+
         Returns:
             str: "K" 単位でフォーマットされた文字列。
         """
@@ -971,7 +982,7 @@ def PlotSwapData(DailySwapAndTradingProfit, CumulativeSwapAndTradingProfit):
         Parameters:
             X (int): 表示する値。
             _ (Any): 不使用（軸の位置用パラメータ）。
-        
+
         Returns:
             str: "M" 単位でフォーマットされた文字列。
         """
