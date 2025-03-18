@@ -1,4 +1,4 @@
-# Bitcoin and Other Cryptocurrency AI Auto-Trading Application "bitBuyer 0.8.1.a": An Overview
+# Bitcoin and Other Cryptocurrency Auto-Trading AI Application "bitBuyer 0.8.1.a": An Overview
 "bitBuyer 0.8.1.a" is an open-source (license: General Public License ver 3), cutting-edge AI-powered application designed to make automated cryptocurrency trading accessible to everyone. It is optimized for efficient day trading and short-term trading of Bitcoin and Ethereum, with a focus on maximizing profits. Featuring a user-friendly interface suitable for beginners, it leverages advanced AI technology to provide in-depth analysis, paving the way for the future of asset management. This project emphasizes transparency and flexibility, offering freely customizable source code to unlock new possibilities.<br>
 The details of this project can be found on the [Wiki](https://github.com/ShoheiKIMURA389/The-Cryptocurrency-Auto-Trading-Application-bitBuyer-0.8.1.a/wiki).
 
